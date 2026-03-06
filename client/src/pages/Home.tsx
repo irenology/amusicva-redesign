@@ -42,31 +42,31 @@ const faculty = [
     name: "Norman Charette",
     instrument: "Piano",
     short: "DMA Candidate, Indiana University MM. Faculty at College of William & Mary. Performed across the US and in China's 2024 China-US Youth Festival.",
-    unsplash: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
+    unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/20250505_164140---zoomed---pop---shadow-removed-YZ98qkboDRFaq67p.jpg",
   },
   {
     name: "Bogdan (Bobo) Pejić",
     instrument: "Guitar, Ukulele & Composition",
     short: "Internationally acclaimed guitarist with 1,400+ concerts across Europe and South America. Founding member of Beltango Quinteto.",
-    unsplash: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=face",
+    unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/dsc04692~2-AoPJebP3vySaZOpR.jpg",
   },
   {
     name: "Vesna Pejić",
     instrument: "Violin, Viola & Ukulele",
     short: "Professional violist and violinist with 20+ years of experience. Performed with orchestras across Europe including Austria, France, Italy, Spain, and Sweden.",
-    unsplash: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop&crop=face",
+    unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/fb_img_1739448270556-mv0Jjby5X3F0vPbO.jpg",
   },
   {
     name: "Erin McAfee",
     instrument: "Flute & Piccolo",
     short: "DC-based flutist, winner of the 2025 UW Wind Ensemble concerto competition. Member of the prestigious DCFlutes ensemble.",
-    unsplash: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop&crop=face",
+    unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/erin-mcafee-1-A1azw0DnWBu5GgkQ.jpeg",
   },
   {
     name: "Teymour Saifi",
     instrument: "Electric Bass",
     short: "DC-based bassist, composer, and educator. Georgetown University music theory and performance studies. Performs across rock, ambient, and experimental genres.",
-    unsplash: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop&crop=face",
+    unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/teymour-saifi-1-jpeg-m7VDw0bQVLSqo8zY.jpg",
   },
 ];
 
