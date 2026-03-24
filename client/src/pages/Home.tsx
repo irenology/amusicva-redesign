@@ -1,4 +1,4 @@
-/* =============================================================
+/* ═══════════════════════════════════════════════════════════════
    HOME PAGE — CREAM (OPTION A) DESIGN
    Design: Warm cream/ivory background, deep brown text, gold/amber accents
    Fonts: Cormorant Garamond (display), Source Sans 3 (body), Outfit (UI)
@@ -99,8 +99,87 @@ function Divider() {
   );
 }
 
+// ─── Calendly Booking Modal ───────────────────────────────────
+function CalendlyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl rounded-lg overflow-hidden shadow-2xl"
+        style={{ background: C.white, maxHeight: "90vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div
+          className="sticky top-0 flex items-center justify-between p-6 border-b"
+          style={{ background: C.card, borderColor: C.border }}
+        >
+          <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
+            Schedule Your Lesson
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
+            style={{ color: C.muted, background: "none", border: "none" }}
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          <p className="mb-6" style={{ color: C.textMid, fontSize: "1rem", lineHeight: "1.6" }}>
+            Select your preferred instrument and teacher to book a lesson. You'll receive a confirmation email with all the details including the lesson time, duration, location, and pricing.
+          </p>
+
+          {/* Calendly Embed */}
+          <div className="rounded overflow-hidden" style={{ border: `1px solid ${C.border}`, background: "#fff" }}>
+            <iframe
+              src="https://calendly.com/appassionata-music?hide_landing_page_details=1&hide_gdpr_banner=1"
+              width="100%"
+              height="650"
+              frameBorder="0"
+              title="Calendly Booking"
+              style={{ borderRadius: "8px", display: "block" }}
+            />
+          </div>
+
+          <p
+            className="mt-6 text-sm"
+            style={{ color: C.muted, textAlign: "center", lineHeight: "1.6" }}
+          >
+            Questions? Contact us at{" "}
+            <a
+              href="mailto:amusicva@gmail.com"
+              style={{ color: C.accent, textDecoration: "none", fontWeight: 500 }}
+            >
+              amusicva@gmail.com
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Navigation ───────────────────────────────────────────────
-function Nav() {
+function Nav({ onBookClick }: { onBookClick: () => void }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -165,15 +244,13 @@ function Nav() {
               />
             </a>
           ))}
-          <a
-            href="https://amusicva.com/book-here"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-ui text-sm px-5 py-2 rounded transition-all duration-200 hover:opacity-90"
-            style={{ background: C.accent, color: C.white, fontWeight: 600, letterSpacing: "0.05em" }}
+          <button
+            onClick={onBookClick}
+            className="font-ui text-sm px-5 py-2 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
+            style={{ background: C.accent, color: C.white, fontWeight: 600, letterSpacing: "0.05em", border: "none" }}
           >
             Book Now
-          </a>
+          </button>
         </div>
 
         {/* Mobile Button */}
@@ -199,15 +276,16 @@ function Nav() {
               {l.label}
             </a>
           ))}
-          <a
-            href="https://amusicva.com/book-here"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-ui text-sm px-5 py-3 rounded text-center mt-2"
-            style={{ background: C.accent, color: C.white, fontWeight: 600 }}
+          <button
+            onClick={() => {
+              onBookClick();
+              setOpen(false);
+            }}
+            className="font-ui text-sm px-5 py-3 rounded text-center mt-2 w-full cursor-pointer"
+            style={{ background: C.accent, color: C.white, fontWeight: 600, border: "none" }}
           >
             Book Now
-          </a>
+          </button>
         </div>
       )}
     </nav>
@@ -298,57 +376,26 @@ function Hero() {
           className="w-full max-w-3xl rounded overflow-hidden"
           style={{
             border: `1px solid ${C.border}`,
-            boxShadow: `0 8px 40px ${C.accent}18`,
-            position: "relative",
-            paddingBottom: "56.25%",
-            height: 0,
+            boxShadow: `0 20px 60px ${C.accent}15`,
           }}
         >
-          <iframe
-            src={`https://player.vimeo.com/video/${VIMEO_ID}?autoplay=0&controls=1&loop=0&autopause=0&playsinline=1&muted=0`}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              border: "none",
-            }}
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            title="Appassionata Music School"
-          />
+          <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden" }}>
+            <iframe
+              src={`https://player.vimeo.com/video/${VIMEO_ID}`}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              title="Appassionata Music School"
+            />
+          </div>
         </div>
-
-        {/* Stats */}
-        <div
-          className="mt-14 pt-8 flex flex-wrap gap-10 justify-center"
-          style={{ borderTop: `1px solid ${C.border}` }}
-        >
-          {[
-            { value: "5", label: "World-Class Faculty" },
-            { value: "5+", label: "Instruments Taught" },
-            { value: "All", label: "Skill Levels Welcome" },
-            { value: "Daily", label: "Practice Hours Available" },
-          ].map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="font-display text-3xl" style={{ color: C.accent, fontWeight: 600 }}>
-                {s.value}
-              </div>
-              <div
-                className="font-ui text-xs tracking-wide mt-0.5"
-                style={{ color: C.muted, letterSpacing: "0.05em" }}
-              >
-                {s.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-        <ChevronDown size={20} style={{ color: `${C.accent}80` }} />
       </div>
     </section>
   );
@@ -357,272 +404,298 @@ function Hero() {
 // ─── Vision Section ───────────────────────────────────────────
 function Vision() {
   return (
-    <section id="vision" className="py-28" style={{ background: C.bg }}>
+    <section id="vision" className="py-24" style={{ background: C.bg }}>
       <div className="container">
-        <Divider />
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Text */}
-          <div className="reveal">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          {/* Left: Content */}
+          <div className="reveal" style={{ transitionDelay: "0s" }}>
             <div
-              className="font-ui text-xs tracking-widest uppercase mb-6"
+              className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
               style={{ color: C.accent, letterSpacing: "0.2em" }}
             >
+              <span className="w-4 h-px" style={{ background: C.accent }} />
               Our Vision
             </div>
+
             <h2
-              className="font-display mb-8 leading-tight"
-              style={{ fontSize: "clamp(2.2rem, 4.5vw, 3.8rem)", color: C.text, fontWeight: 400 }}
+              className="font-display mb-6 leading-tight"
+              style={{
+                fontSize: "clamp(2rem, 5vw, 3.5rem)",
+                color: C.text,
+                fontWeight: 400,
+                letterSpacing: "-0.01em",
+              }}
             >
               More than a music school —
               <br />
-              <span style={{ fontStyle: "italic", color: C.accent }}>a launchpad for life.</span>
+              <span style={{ color: C.accent, fontStyle: "italic" }}>a launchpad for life.</span>
             </h2>
-            <div className="space-y-5 leading-relaxed" style={{ color: C.textMid, fontSize: "1.05rem", fontWeight: 300 }}>
-              <p>
-                At Appassionata Music School of VA, our instructors are professional musicians — many holding advanced degrees including doctorates and masters. Our faculty has performed on stages across{" "}
-                <strong style={{ color: C.text, fontWeight: 500 }}>Europe, America, and Asia</strong>, bringing real-world, international experience directly into the classroom.
-              </p>
-              <p>
-                We don't just teach notes and techniques. We teach{" "}
-                <em style={{ color: C.text }}>confidence, stage presence, and the art of storytelling through music</em>.
-              </p>
-              <p>
-                Our students gain ongoing live performance opportunities at community events, concerts, festivals, and competitions — building not just skill, but character.
-              </p>
-            </div>
 
-            {/* Values */}
-            <div className="mt-10 grid grid-cols-2 gap-3">
+            <p
+              className="mb-6 leading-relaxed"
+              style={{ color: C.textMid, fontSize: "1rem", fontWeight: 300 }}
+            >
+              At Appassionata Music School of VA, our instructors are professional musicians — many holding advanced degrees including doctorates and masters. Our faculty has performed on stages across <strong>Europe, America, and Asia</strong>, bringing real-world, international experience directly into the classroom.
+            </p>
+
+            <p
+              className="mb-8 leading-relaxed"
+              style={{ color: C.textMid, fontSize: "1rem", fontWeight: 300 }}
+            >
+              We don't just teach notes and techniques. We teach <em>confidence, stage presence, and the art of storytelling through music</em>.
+            </p>
+
+            <p
+              className="mb-8 leading-relaxed"
+              style={{ color: C.textMid, fontSize: "1rem", fontWeight: 300 }}
+            >
+              Our students gain ongoing live performance opportunities at community events, concerts, festivals, and competitions — building not just skill, but character.
+            </p>
+
+            {/* Outcomes Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
               {[
                 "How to perform with confidence",
                 "How to express emotion through music",
                 "How to practice and problem-solve",
                 "How to collaborate and lead",
-              ].map((v) => (
-                <div
-                  key={v}
-                  className="flex items-start gap-3 p-4 rounded"
-                  style={{ background: C.card, border: `1px solid ${C.border}` }}
-                >
-                  <Star size={13} className="mt-0.5 flex-shrink-0" style={{ color: C.accent }} />
-                  <span className="font-ui text-sm leading-snug" style={{ color: C.muted, fontWeight: 300 }}>
-                    {v}
-                  </span>
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <Star size={16} style={{ color: C.accent, flexShrink: 0, marginTop: "0.25rem" }} />
+                  <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}>{item}</p>
                 </div>
               ))}
             </div>
+
+            {/* Quote */}
+            <div
+              className="p-6 rounded"
+              style={{
+                background: `${C.accent}08`,
+                border: `1px solid ${C.accent}20`,
+                borderLeft: `4px solid ${C.accent}`,
+              }}
+            >
+              <p style={{ color: C.textMid, fontSize: "1rem", fontStyle: "italic", fontWeight: 300 }}>
+                "Appassionata transformed my musical journey with exceptional teachers and a supportive community."
+              </p>
+              <p style={{ color: C.muted, fontSize: "0.85rem", marginTop: "0.5rem" }}>— Student Review</p>
+            </div>
           </div>
 
-          {/* Image */}
-          <div className="reveal" style={{ transitionDelay: "0.15s" }}>
-            <div className="relative">
-              <img
-                src={LESSONS_IMG}
-                alt="Music lesson in session"
-                className="w-full rounded object-cover"
-                style={{ height: "500px", filter: "brightness(0.95) contrast(1.02)" }}
-              />
-              <div
-                className="absolute -bottom-4 -right-4 w-2/3 h-2/3 rounded -z-10"
-                style={{ border: `1px solid ${C.accent}40` }}
-              />
-              {/* Quote overlay */}
-              <div
-                className="absolute bottom-6 left-6 right-6 p-5 rounded"
-                style={{
-                  background: `${C.white}EE`,
-                  backdropFilter: "blur(8px)",
-                  border: `1px solid ${C.border}`,
-                }}
+          {/* Right: Lessons Info */}
+          <div className="reveal" style={{ transitionDelay: "0.08s" }}>
+            <div
+              className="p-8 rounded"
+              style={{ background: C.card, border: `1px solid ${C.border}` }}
+            >
+              <h3 className="font-display text-2xl mb-6" style={{ color: C.text, fontWeight: 500 }}>
+                Individual & Group Lessons
+              </h3>
+
+              <p
+                className="mb-6 leading-relaxed"
+                style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}
               >
-                <p className="font-display text-lg italic leading-snug" style={{ color: C.text, fontWeight: 400 }}>
-                  "Appassionata transformed my musical journey with exceptional teachers and a supportive community."
-                </p>
-                <p className="font-ui text-xs mt-2 tracking-wide" style={{ color: C.accent, letterSpacing: "0.05em" }}>
-                  — Student Review
-                </p>
-              </div>
+                Personalized one-on-one instruction tailored to your goals, or collaborative group sessions that build ensemble skills and musical community.
+              </p>
+
+              <a
+                href="#lessons"
+                className="font-ui inline-block px-8 py-3.5 rounded transition-all hover:opacity-90"
+                style={{ background: C.accent, color: C.white, fontWeight: 600, fontSize: "0.9rem", letterSpacing: "0.05em" }}
+              >
+                Book a Lesson
+              </a>
             </div>
           </div>
         </div>
       </div>
+
+      <Divider />
     </section>
   );
 }
 
 // ─── Lessons Section ──────────────────────────────────────────
 function Lessons() {
-  const instruments = [
-    { name: "Piano", icon: "🎹", desc: "Classical, contemporary, and jazz piano for all ages and skill levels." },
-    { name: "Guitar & Ukulele", icon: "🎸", desc: "Classical, jazz, tango, and contemporary guitar. Ukulele for all ages." },
-    { name: "Violin & Viola", icon: "🎻", desc: "From beginner to competition-ready. Chamber music and ensemble work." },
-    { name: "Flute & Piccolo", icon: "🎵", desc: "Solo, orchestral, and chamber flute. All levels from beginner to advanced." },
-    { name: "Electric Bass", icon: "🎸", desc: "Rock, jazz, ambient, and experimental. Improvisation and composition." },
-    { name: "Composition", icon: "🎼", desc: "Learn to write and arrange music across genres with expert guidance." },
+  const lessons = [
+    { icon: "🎹", title: "Piano", desc: "Classical, contemporary, and jazz piano for all ages and skill levels." },
+    { icon: "🎸", title: "Guitar & Ukulele", desc: "Classical, jazz, tango, and contemporary guitar. Ukulele for all ages." },
+    { icon: "🎻", title: "Violin & Viola", desc: "From beginner to competition-ready. Chamber music and ensemble work." },
+    { icon: "🎵", title: "Flute & Piccolo", desc: "Solo, orchestral, and chamber flute. All levels from beginner to advanced." },
+    { icon: "🎸", title: "Electric Bass", desc: "Rock, jazz, ambient, and experimental. Improvisation and composition." },
+    { icon: "🎼", title: "Composition", desc: "Learn to write and arrange music across genres with expert guidance." },
   ];
 
   return (
-    <section id="lessons" className="py-28" style={{ background: C.bgAlt }}>
+    <section id="lessons" className="py-24" style={{ background: C.bg }}>
       <div className="container">
-        <Divider />
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Image + CTA */}
-          <div className="reveal lg:sticky lg:top-28">
-            <img
-              src={INSTRUMENTS_IMG}
-              alt="Musical instruments"
-              className="w-full rounded object-cover"
-              style={{ height: "440px", filter: "brightness(0.95) contrast(1.02)" }}
-            />
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
+            style={{ color: C.accent, letterSpacing: "0.2em" }}
+          >
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+            Lessons
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+          </div>
+
+          <h2
+            className="font-display mb-6 leading-tight"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              color: C.text,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Find your instrument,
+            <br />
+            <span style={{ color: C.accent, fontStyle: "italic" }}>find your voice.</span>
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {lessons.map((lesson, i) => (
             <div
-              className="mt-8 p-6 rounded"
-              style={{ background: C.card, border: `1px solid ${C.border}` }}
+              key={i}
+              className="reveal p-8 rounded transition-all hover:shadow-lg"
+              style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                transitionDelay: `${i * 0.04}s`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = C.white;
+                e.currentTarget.style.borderColor = C.accent;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = C.card;
+                e.currentTarget.style.borderColor = C.border;
+              }}
             >
-              <h3 className="font-display text-2xl mb-3" style={{ color: C.text, fontWeight: 500 }}>
-                Individual & Group Lessons
+              <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>{lesson.icon}</div>
+              <h3 className="font-display text-xl mb-3" style={{ color: C.text, fontWeight: 500 }}>
+                {lesson.title}
               </h3>
-              <p className="font-ui text-sm leading-relaxed mb-5" style={{ color: C.muted, fontWeight: 300 }}>
-                Personalized one-on-one instruction tailored to your goals, or collaborative group sessions that build ensemble skills and musical community.
+              <p style={{ color: C.muted, fontSize: "0.95rem", fontWeight: 300, lineHeight: "1.6" }}>
+                {lesson.desc}
               </p>
-              <a
-                href="https://amusicva.com/book-here"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-ui text-sm px-6 py-3 rounded inline-block transition-all hover:opacity-90"
-                style={{ background: C.accent, color: C.white, fontWeight: 600, letterSpacing: "0.05em" }}
-              >
-                Book a Lesson
-              </a>
             </div>
-          </div>
-
-          {/* Instruments */}
-          <div className="reveal" style={{ transitionDelay: "0.1s" }}>
-            <div className="font-ui text-xs tracking-widest uppercase mb-6" style={{ color: C.accent, letterSpacing: "0.2em" }}>
-              Lessons
-            </div>
-            <h2
-              className="font-display mb-10 leading-tight"
-              style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", color: C.text, fontWeight: 400 }}
-            >
-              Find your instrument,
-              <br />
-              <span style={{ fontStyle: "italic", color: C.accent }}>find your voice.</span>
-            </h2>
-
-            <div className="space-y-3">
-              {instruments.map((inst, i) => (
-                <div
-                  key={inst.name}
-                  className="p-5 rounded transition-all duration-300 group"
-                  style={{
-                    background: C.bg,
-                    border: `1px solid ${C.border}`,
-                    transitionDelay: `${i * 0.05}s`,
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = `${C.accent}60`;
-                    (e.currentTarget as HTMLDivElement).style.background = C.card;
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = C.border;
-                    (e.currentTarget as HTMLDivElement).style.background = C.bg;
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl mt-0.5">{inst.icon}</span>
-                    <div>
-                      <h3 className="font-display text-xl mb-1" style={{ color: C.text, fontWeight: 500 }}>
-                        {inst.name}
-                      </h3>
-                      <p className="font-ui text-sm leading-relaxed" style={{ color: C.muted, fontWeight: 300 }}>
-                        {inst.desc}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
+
+      <Divider />
     </section>
   );
 }
 
 // ─── Faculty Section ──────────────────────────────────────────
 function Faculty() {
-  const [active, setActive] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   return (
-    <section id="faculty" className="py-28" style={{ background: C.bg }}>
+    <section id="faculty" className="py-24" style={{ background: C.bg }}>
       <div className="container">
-        <Divider />
-        <div className="reveal mb-16">
-          <div className="font-ui text-xs tracking-widest uppercase mb-6" style={{ color: C.accent, letterSpacing: "0.2em" }}>
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
+            style={{ color: C.accent, letterSpacing: "0.2em" }}
+          >
+            <span className="w-4 h-px" style={{ background: C.accent }} />
             Our Faculty
+            <span className="w-4 h-px" style={{ background: C.accent }} />
           </div>
+
           <h2
-            className="font-display leading-tight"
-            style={{ fontSize: "clamp(2.2rem, 4.5vw, 3.8rem)", color: C.text, fontWeight: 400 }}
+            className="font-display mb-6 leading-tight"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              color: C.text,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+            }}
           >
             World-class musicians.
             <br />
-            <span style={{ fontStyle: "italic", color: C.accent }}>Dedicated teachers.</span>
+            <span style={{ color: C.accent, fontStyle: "italic" }}>Dedicated teachers.</span>
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid md:grid-cols-5 gap-6 mb-8">
           {faculty.map((f, i) => (
             <div
-              key={f.name}
-              className="reveal group cursor-pointer"
-              style={{ transitionDelay: `${i * 0.08}s` }}
-              onClick={() => setActive(active === i ? null : i)}
+              key={i}
+              className="reveal cursor-pointer transition-all"
+              style={{ transitionDelay: `${i * 0.04}s` }}
+              onClick={() => setExpanded(expanded === i ? null : i)}
             >
               <div
-                className="relative overflow-hidden rounded"
+                className="relative rounded overflow-hidden mb-4 aspect-square group"
                 style={{ border: `1px solid ${C.border}` }}
               >
-                <div className="relative overflow-hidden" style={{ paddingBottom: "125%" }}>
-                  <img
-                    src={f.unsplash}
-                    alt={f.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    style={{ filter: "grayscale(20%) brightness(0.95)" }}
-                  />
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ background: `${C.accent}12` }}
-                  />
-                </div>
-                <div className="p-4" style={{ background: C.card }}>
-                  <h3 className="font-display text-lg leading-tight mb-1" style={{ color: C.text, fontWeight: 500 }}>
-                    {f.name}
-                  </h3>
-                  <p className="font-ui text-xs tracking-wide" style={{ color: C.accent, letterSpacing: "0.05em" }}>
-                    {f.instrument}
+                <img
+                  src={f.unsplash}
+                  alt={f.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div
+                  className="absolute inset-0 flex items-end p-4 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                  style={{ background: `linear-gradient(to top, ${C.text}80, transparent)` }}
+                >
+                  <p style={{ color: C.white, fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em" }}>
+                    Click to learn more
                   </p>
                 </div>
               </div>
 
-              {active === i && (
-                <div
-                  className="mt-2 p-4 rounded"
-                  style={{ background: C.card, border: `1px solid ${C.accent}40` }}
-                >
-                  <p className="font-ui text-sm leading-relaxed" style={{ color: C.textMid, fontWeight: 300 }}>
-                    {f.short}
-                  </p>
-                </div>
-              )}
+              <h3 className="font-display text-lg mb-1" style={{ color: C.text, fontWeight: 500 }}>
+                {f.name}
+              </h3>
+              <p className="font-ui text-xs" style={{ color: C.accent, letterSpacing: "0.05em", fontWeight: 600 }}>
+                {f.instrument}
+              </p>
             </div>
           ))}
         </div>
-        <p className="text-center mt-8 font-ui text-sm" style={{ color: C.muted }}>
+
+        <p className="text-center font-ui text-sm" style={{ color: C.muted, letterSpacing: "0.05em" }}>
           Click any faculty member to learn more
         </p>
+
+        {/* Expanded Bio */}
+        {expanded !== null && (
+          <div
+            className="mt-12 p-8 rounded"
+            style={{ background: C.card, border: `1px solid ${C.border}` }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="font-display text-2xl mb-2" style={{ color: C.text, fontWeight: 500 }}>
+                  {faculty[expanded].name}
+                </h3>
+                <p style={{ color: C.accent, fontSize: "0.9rem", fontWeight: 600, letterSpacing: "0.05em" }}>
+                  {faculty[expanded].instrument}
+                </p>
+              </div>
+              <button
+                onClick={() => setExpanded(null)}
+                className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
+                style={{ color: C.muted, background: "none", border: "none" }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300, lineHeight: "1.7" }}>
+              {faculty[expanded].short}
+            </p>
+          </div>
+        )}
       </div>
+
+      <Divider />
     </section>
   );
 }
@@ -633,191 +706,188 @@ function Spaces() {
     {
       title: "Practice Rooms",
       desc: "Professional practice rooms used by our faculty for lessons, available for individual rental. Equipped with quality instruments and acoustically treated.",
-      details: ["Daily availability 6am–2am", "Acoustic treatment", "Quality instruments provided", "Flexible hourly rental"],
-      img: "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=800&h=600&fit=crop",
+      features: ["Daily availability 6am–2am", "Acoustic treatment", "Quality instruments provided", "Flexible hourly rental"],
     },
     {
       title: "Performance Space",
       desc: "Our elegant performance space is available for recitals, showcases, concerts, and private events. Perfect for student recitals or professional performances.",
-      details: ["Concert-quality grand piano", "Professional lighting", "Ideal for recitals & events", "Rental inquiries welcome"],
-      img: PERFORMANCE_IMG,
+      features: ["Concert-quality grand piano", "Professional lighting", "Ideal for recitals & events", "Rental inquiries welcome"],
     },
   ];
 
   return (
-    <section id="spaces" className="py-28" style={{ background: C.bgAlt }}>
+    <section id="spaces" className="py-24" style={{ background: C.bg }}>
       <div className="container">
-        <Divider />
-        <div className="reveal mb-16">
-          <div className="font-ui text-xs tracking-widest uppercase mb-6" style={{ color: C.accent, letterSpacing: "0.2em" }}>
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
+            style={{ color: C.accent, letterSpacing: "0.2em" }}
+          >
+            <span className="w-4 h-px" style={{ background: C.accent }} />
             Our Spaces
+            <span className="w-4 h-px" style={{ background: C.accent }} />
           </div>
+
           <h2
-            className="font-display leading-tight"
-            style={{ fontSize: "clamp(2.2rem, 4.5vw, 3.8rem)", color: C.text, fontWeight: 400 }}
+            className="font-display mb-6 leading-tight"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              color: C.text,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+            }}
           >
             Practice. Perform.
             <br />
-            <span style={{ fontStyle: "italic", color: C.accent }}>Make it yours.</span>
+            <span style={{ color: C.accent, fontStyle: "italic" }}>Make it yours.</span>
           </h2>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {spaces.map((space, i) => (
-            <div
-              key={space.title}
-              className="reveal group rounded overflow-hidden"
-              style={{ border: `1px solid ${C.border}`, transitionDelay: `${i * 0.12}s` }}
-            >
-              <div className="relative overflow-hidden" style={{ height: "260px" }}>
-                <img
-                  src={space.img}
-                  alt={space.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  style={{ filter: "brightness(0.9) contrast(1.05)" }}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{ background: "linear-gradient(to top, rgba(44,26,14,0.5) 0%, transparent 60%)" }}
-                />
-                <div className="absolute bottom-5 left-6">
-                  <h3 className="font-display text-3xl" style={{ color: C.white, fontWeight: 500 }}>
-                    {space.title}
-                  </h3>
-                </div>
-              </div>
-              <div className="p-6" style={{ background: C.card }}>
-                <p className="font-ui text-sm leading-relaxed mb-5" style={{ color: C.muted, fontWeight: 300 }}>
+            <div key={i} className="reveal" style={{ transitionDelay: `${i * 0.08}s` }}>
+              <div
+                className="p-8 rounded"
+                style={{ background: C.card, border: `1px solid ${C.border}` }}
+              >
+                <h3 className="font-display text-2xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+                  {space.title}
+                </h3>
+
+                <p
+                  className="mb-6 leading-relaxed"
+                  style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}
+                >
                   {space.desc}
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {space.details.map((d) => (
-                    <div key={d} className="flex items-center gap-2 font-ui text-xs" style={{ color: C.textMid }}>
-                      <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: C.accent }} />
-                      {d}
-                    </div>
+
+                <ul className="space-y-2">
+                  {space.features.map((f, j) => (
+                    <li key={j} className="flex items-center gap-3">
+                      <span style={{ color: C.accent, fontWeight: 600 }}>✓</span>
+                      <span style={{ color: C.muted, fontSize: "0.9rem", fontWeight: 300 }}>{f}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      <Divider />
     </section>
   );
 }
 
 // ─── Contact Section ──────────────────────────────────────────
-function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+function Contact({ onBookClick }: { onBookClick: () => void }) {
   const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSent(true);
-    setTimeout(() => setSent(false), 4000);
+    setTimeout(() => setSent(false), 5000);
     setForm({ name: "", email: "", phone: "", message: "" });
   };
 
   const inputStyle = {
     width: "100%",
-    padding: "12px 14px",
-    borderRadius: "4px",
+    padding: "0.75rem",
     border: `1px solid ${C.border}`,
-    background: C.bg,
+    borderRadius: "0.5rem",
+    fontFamily: "inherit",
+    fontSize: "0.95rem",
     color: C.text,
-    fontFamily: "'Outfit', sans-serif",
-    fontSize: "14px",
-    fontWeight: 300,
-    outline: "none",
+    background: C.white,
+    transition: "border-color 0.2s",
   };
 
   return (
-    <section id="contact" className="py-28" style={{ background: C.bg }}>
+    <section id="contact" className="py-24" style={{ background: C.bg }}>
       <div className="container">
-        <Divider />
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Info */}
-          <div className="reveal">
-            <div className="font-ui text-xs tracking-widest uppercase mb-6" style={{ color: C.accent, letterSpacing: "0.2em" }}>
-              Contact & Location
-            </div>
-            <h2
-              className="font-display mb-8 leading-tight"
-              style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", color: C.text, fontWeight: 400 }}
-            >
-              Start your
-              <br />
-              <span style={{ fontStyle: "italic", color: C.accent }}>music journey today.</span>
-            </h2>
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
+            style={{ color: C.accent, letterSpacing: "0.2em" }}
+          >
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+            Contact & Location
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+          </div>
 
-            <div className="space-y-6 mb-10">
+          <h2
+            className="font-display mb-6 leading-tight"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              color: C.text,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Start your
+            <br />
+            <span style={{ color: C.accent, fontStyle: "italic" }}>music journey today.</span>
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* Left: Info */}
+          <div className="reveal" style={{ transitionDelay: "0s" }}>
+            <div className="space-y-8">
               {[
                 {
-                  icon: <MapPin size={16} style={{ color: C.accent }} />,
+                  icon: MapPin,
                   label: "Address",
-                  content: (
-                    <p className="font-ui text-sm leading-relaxed" style={{ color: C.textMid, fontWeight: 300 }}>
-                      3911 Blenheim Blvd, Unit 43C<br />Fairfax, VA 22030
-                    </p>
-                  ),
+                  content: "3911 Blenheim Blvd, Unit 43C\nFairfax, VA 22030",
                 },
                 {
-                  icon: <Clock size={16} style={{ color: C.accent }} />,
+                  icon: Clock,
                   label: "Hours",
-                  content: (
-                    <div className="font-ui text-sm leading-relaxed" style={{ color: C.textMid, fontWeight: 300 }}>
-                      <p>Weekday Lessons: Mon–Fri, 2pm–9pm</p>
-                      <p>Weekend Lessons: Sat–Sun, 10am–6pm</p>
-                      <p>Practice Rooms: Daily, 6am–2am</p>
-                    </div>
-                  ),
+                  content: "Weekday Lessons: Mon–Fri, 2pm–9pm\nWeekend Lessons: Sat–Sun, 10am–6pm\nPractice Rooms: Daily, 6am–2am",
                 },
                 {
-                  icon: <Mail size={16} style={{ color: C.accent }} />,
+                  icon: Mail,
                   label: "Online",
-                  content: (
-                    <a
-                      href="https://amusicva.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-ui text-sm transition-colors"
-                      style={{ color: C.accent, fontWeight: 400 }}
-                    >
-                      amusicva.com
-                    </a>
-                  ),
+                  content: "amusicva.com\nBook a Lesson Online",
                 },
-              ].map((item) => (
-                <div key={item.label} className="flex items-start gap-4">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: `${C.accent}15`, border: `1px solid ${C.accent}40` }}
-                  >
-                    {item.icon}
-                  </div>
-                  <div>
-                    <p className="font-ui text-xs uppercase tracking-widest mb-1" style={{ color: C.accent, letterSpacing: "0.15em" }}>
+              ].map((item, i) => (
+                <div key={i}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <item.icon size={18} style={{ color: C.accent }} />
+                    <p
+                      className="font-ui text-xs uppercase tracking-widest"
+                      style={{ color: C.muted, letterSpacing: "0.1em" }}
+                    >
                       {item.label}
                     </p>
-                    {item.content}
                   </div>
+                  <p
+                    style={{
+                      color: C.textMid,
+                      fontSize: "0.95rem",
+                      fontWeight: 300,
+                      whiteSpace: "pre-line",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    {item.content}
+                  </p>
                 </div>
               ))}
             </div>
 
-            <a
-              href="https://amusicva.com/book-here"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-ui inline-block px-8 py-3.5 rounded transition-all hover:opacity-90"
-              style={{ background: C.accent, color: C.white, fontWeight: 600, fontSize: "0.9rem", letterSpacing: "0.05em" }}
+            <button
+              onClick={onBookClick}
+              className="font-ui inline-block px-8 py-3.5 rounded transition-all hover:opacity-90 cursor-pointer mt-8"
+              style={{ background: C.accent, color: C.white, fontWeight: 600, fontSize: "0.9rem", letterSpacing: "0.05em", border: "none" }}
             >
               Book a Lesson Online
-            </a>
+            </button>
           </div>
 
-          {/* Form */}
+          {/* Right: Form */}
           <div className="reveal" style={{ transitionDelay: "0.12s" }}>
             <div
               className="p-8 rounded"
@@ -858,8 +928,8 @@ function Contact() {
                       value={form[field.id as keyof typeof form]}
                       onChange={(e) => setForm({ ...form, [field.id]: e.target.value })}
                       style={inputStyle}
-                      onFocus={(e) => (e.target.style.borderColor = `${C.accent}80`)}
-                      onBlur={(e) => (e.target.style.borderColor = C.border)}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = `${C.accent}80`)}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = C.border)}
                     />
                   </div>
                 ))}
@@ -880,15 +950,15 @@ function Contact() {
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     style={{ ...inputStyle, resize: "none" }}
-                    onFocus={(e) => (e.target.style.borderColor = `${C.accent}80`)}
-                    onBlur={(e) => (e.target.style.borderColor = C.border)}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = `${C.accent}80`)}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = C.border)}
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded font-ui text-sm font-semibold transition-all hover:opacity-90 mt-2"
-                  style={{ background: C.accent, color: C.white, letterSpacing: "0.05em" }}
+                  className="w-full py-3.5 rounded font-ui text-sm font-semibold transition-all hover:opacity-90 mt-2 cursor-pointer"
+                  style={{ background: C.accent, color: C.white, letterSpacing: "0.05em", border: "none" }}
                 >
                   Send Message
                 </button>
@@ -926,13 +996,11 @@ function Footer() {
               { label: "Faculty", href: "#faculty" },
               { label: "Spaces", href: "#spaces" },
               { label: "Contact", href: "#contact" },
-              { label: "Book Online", href: "https://amusicva.com/book-here" },
+              { label: "Book Online", href: "#" },
             ].map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                target={l.href.startsWith("http") ? "_blank" : undefined}
-                rel={l.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="font-ui text-xs transition-colors"
                 style={{ color: C.muted, letterSpacing: "0.05em" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = C.accent)}
@@ -971,16 +1039,18 @@ function Footer() {
 // ─── Main Page ────────────────────────────────────────────────
 export default function Home() {
   useReveal();
+  const [showCalendly, setShowCalendly] = useState(false);
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
-      <Nav />
+      <Nav onBookClick={() => setShowCalendly(true)} />
+      <CalendlyModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} />
       <Hero />
       <Vision />
       <Lessons />
       <Faculty />
       <Spaces />
-      <Contact />
+      <Contact onBookClick={() => setShowCalendly(true)} />
       <Footer />
     </div>
   );
