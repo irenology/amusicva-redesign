@@ -1,20 +1,10 @@
-/* ═══════════════════════════════════════════════════════════════
-   HOME PAGE — CREAM (OPTION A) DESIGN
-   Design: Warm cream/ivory background, deep brown text, gold/amber accents
-   Fonts: Cormorant Garamond (display), Source Sans 3 (body), Outfit (UI)
-   Colors:
-     bg:      #FAF7F2 (warm cream)
-     text:    #2C1A0E (deep brown)
-     accent:  #B8860B (dark goldenrod)
-     card:    #F2EDE4
-     border:  #D4C5A9
-     muted:   #8B7355
-   ============================================================= */
-
 import { useEffect, useState } from "react";
 import { Menu, X, Music, MapPin, Clock, Mail, ChevronDown, Star } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 
 // ─── Color Tokens ─────────────────────────────────────────────
+
 const C = {
   bg:       "#FAF7F2",
   bgAlt:    "#F5EFE6",
@@ -29,14 +19,17 @@ const C = {
 };
 
 // ─── Image URLs ───────────────────────────────────────────────
+
 const LESSONS_IMG     = "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/music-lessons-DBvXHve9iDTfF8DnJacAEQ.webp";
 const INSTRUMENTS_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/instruments-collage-D3j55uxi2k8BPmw3bFSwkm.webp";
 const PERFORMANCE_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/hero-performance-Nidvp7kDrsnypDvYJ9wdtC.webp";
 
 // ─── Vimeo Video ID from original site ───────────────────────
+
 const VIMEO_ID = "1088841151";
 
 // ─── Faculty Data ─────────────────────────────────────────────
+
 const faculty = [
   {
     name: "Norman Charette",
@@ -71,6 +64,7 @@ const faculty = [
 ];
 
 // ─── Scroll Reveal Hook ───────────────────────────────────────
+
 function useReveal() {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -87,6 +81,7 @@ function useReveal() {
 }
 
 // ─── Divider ──────────────────────────────────────────────────
+
 function Divider() {
   return (
     <div
@@ -99,8 +94,14 @@ function Divider() {
   );
 }
 
-// ─── Calendly Booking Modal ───────────────────────────────────
-function CalendlyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+// ─── Booking Modal ─────────────────────────────────────────────
+
+function BookingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [bookingType, setBookingType] = useState<"lesson" | "practice" | null>(null);
+  const [lessonData, setLessonData] = useState({ teacher: "", duration: "", name: "", email: "" });
+  const [practiceData, setPracticeData] = useState({ type: "", hours: "", name: "", email: "" });
+  const [submitted, setSubmitted] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -111,6 +112,52 @@ function CalendlyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       document.body.style.overflow = "auto";
     };
   }, [isOpen]);
+
+  const submitLesson = trpc.bookings.submitLessonBooking.useMutation();
+
+  const handleLessonSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await submitLesson.mutateAsync({
+        studentName: lessonData.name,
+        studentEmail: lessonData.email,
+        teacherName: lessonData.teacher,
+        duration: lessonData.duration as "30" | "45" | "60",
+      });
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+        setBookingType(null);
+        setLessonData({ teacher: "", duration: "", name: "", email: "" });
+      }, 2000);
+    } catch (error) {
+      console.error("Booking failed:", error);
+    }
+  };
+
+  const submitPractice = trpc.bookings.submitPracticeRoomBooking.useMutation();
+
+  const handlePracticeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await submitPractice.mutateAsync({
+        studentName: practiceData.name,
+        studentEmail: practiceData.email,
+        roomType: practiceData.type as "standard" | "premium",
+        hours: parseInt(practiceData.hours),
+      });
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+        setBookingType(null);
+        setPracticeData({ type: "", hours: "", name: "", email: "" });
+      }, 2000);
+    } catch (error) {
+      console.error("Booking failed:", error);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -131,7 +178,7 @@ function CalendlyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
           style={{ background: C.card, borderColor: C.border }}
         >
           <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
-            Schedule Your Lesson
+            {!bookingType ? "What would you like to book?" : bookingType === "lesson" ? "Book a Lesson" : "Rent a Practice Room"}
           </h2>
           <button
             onClick={onClose}
@@ -144,34 +191,261 @@ function CalendlyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
         {/* Content */}
         <div className="p-8">
-          <p className="mb-6" style={{ color: C.textMid, fontSize: "1rem", lineHeight: "1.6" }}>
-            Select your preferred instrument and teacher to book a lesson. You'll receive a confirmation email with all the details including the lesson time, duration, location, and pricing.
-          </p>
+          {!bookingType ? (
+            // Type Selection
+            <div className="space-y-4">
+              <button
+                onClick={() => setBookingType("lesson")}
+                className="w-full p-6 rounded text-left transition-all hover:shadow-md"
+                style={{ background: C.card, border: `1px solid ${C.border}` }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = C.white)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = C.card)}
+              >
+                <h3 className="font-display text-lg mb-2" style={{ color: C.text, fontWeight: 500 }}>
+                  Book a Music Lesson
+                </h3>
+                <p style={{ color: C.muted, fontSize: "0.9rem" }}>
+                  Schedule a lesson with one of our world-class instructors
+                </p>
+              </button>
 
-          {/* Calendly Embed */}
-          <div className="rounded overflow-hidden" style={{ border: `1px solid ${C.border}`, background: "#fff" }}>
-            <iframe
-              src="https://calendly.com/appassionata-music?hide_landing_page_details=1&hide_gdpr_banner=1"
-              width="100%"
-              height="650"
-              frameBorder="0"
-              title="Calendly Booking"
-              style={{ borderRadius: "8px", display: "block" }}
-            />
-          </div>
+              <button
+                onClick={() => setBookingType("practice")}
+                className="w-full p-6 rounded text-left transition-all hover:shadow-md"
+                style={{ background: C.card, border: `1px solid ${C.border}` }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = C.white)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = C.card)}
+              >
+                <h3 className="font-display text-lg mb-2" style={{ color: C.text, fontWeight: 500 }}>
+                  Rent a Practice Room
+                </h3>
+                <p style={{ color: C.muted, fontSize: "0.9rem" }}>
+                  Reserve our professional practice rooms by the hour
+                </p>
+              </button>
+            </div>
+          ) : submitted ? (
+            // Success Message
+            <div className="text-center py-12">
+              <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>✓</div>
+              <h3 className="font-display text-2xl mb-3" style={{ color: C.text, fontWeight: 500 }}>
+                Booking Request Submitted!
+              </h3>
+              <p style={{ color: C.muted, fontSize: "0.95rem" }}>
+                We'll contact you shortly to confirm your booking and discuss details.
+              </p>
+            </div>
+          ) : bookingType === "lesson" ? (
+            // Lesson Form
+            <form onSubmit={handleLessonSubmit} className="space-y-4">
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Teacher
+                </label>
+                <select
+                  value={lessonData.teacher}
+                  onChange={(e) => setLessonData({ ...lessonData, teacher: e.target.value })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                >
+                  <option value="">Select a teacher</option>
+                  {faculty.map((f) => (
+                    <option key={f.name} value={f.name}>
+                      {f.name} ({f.instrument})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <p
-            className="mt-6 text-sm"
-            style={{ color: C.muted, textAlign: "center", lineHeight: "1.6" }}
-          >
-            Questions? Contact us at{" "}
-            <a
-              href="mailto:amusicva@gmail.com"
-              style={{ color: C.accent, textDecoration: "none", fontWeight: 500 }}
-            >
-              amusicva@gmail.com
-            </a>
-          </p>
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Duration
+                </label>
+                <select
+                  value={lessonData.duration}
+                  onChange={(e) => setLessonData({ ...lessonData, duration: e.target.value })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                >
+                  <option value="">Select duration</option>
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60">60 minutes</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={lessonData.name}
+                  onChange={(e) => setLessonData({ ...lessonData, name: e.target.value })}
+                  required
+                  placeholder="Jane Smith"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={lessonData.email}
+                  onChange={(e) => setLessonData({ ...lessonData, email: e.target.value })}
+                  required
+                  placeholder="jane@example.com"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                />
+              </div>
+
+              <p style={{ color: C.muted, fontSize: "0.85rem", fontStyle: "italic" }}>
+                For pricing and available times, please contact us at appassionatava@gmail.com
+              </p>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded font-ui text-sm font-semibold transition-all hover:opacity-90 cursor-pointer"
+                style={{ background: C.accent, color: C.white, border: "none" }}
+              >
+                Submit Booking Request
+              </button>
+            </form>
+          ) : (
+            // Practice Room Form
+            <form onSubmit={handlePracticeSubmit} className="space-y-4">
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Room Type
+                </label>
+                <select
+                  value={practiceData.type}
+                  onChange={(e) => setPracticeData({ ...practiceData, type: e.target.value })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                >
+                  <option value="">Select room type</option>
+                  <option value="standard">Standard Practice Room</option>
+                  <option value="premium">Premium Practice Room (with piano)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Hours
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="8"
+                  value={practiceData.hours}
+                  onChange={(e) => setPracticeData({ ...practiceData, hours: e.target.value })}
+                  required
+                  placeholder="Number of hours"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={practiceData.name}
+                  onChange={(e) => setPracticeData({ ...practiceData, name: e.target.value })}
+                  required
+                  placeholder="Jane Smith"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 600 }}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={practiceData.email}
+                  onChange={(e) => setPracticeData({ ...practiceData, email: e.target.value })}
+                  required
+                  placeholder="jane@example.com"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    color: C.text,
+                    background: C.white,
+                  }}
+                />
+              </div>
+
+              <p style={{ color: C.muted, fontSize: "0.85rem", fontStyle: "italic" }}>
+                For pricing and availability, please contact us at appassionatava@gmail.com
+              </p>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded font-ui text-sm font-semibold transition-all hover:opacity-90 cursor-pointer"
+                style={{ background: C.accent, color: C.white, border: "none" }}
+              >
+                Submit Booking Request
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>
@@ -179,6 +453,7 @@ function CalendlyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 }
 
 // ─── Navigation ───────────────────────────────────────────────
+
 function Nav({ onBookClick }: { onBookClick: () => void }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -293,6 +568,7 @@ function Nav({ onBookClick }: { onBookClick: () => void }) {
 }
 
 // ─── Hero Section (with Vimeo video) ─────────────────────────
+
 function Hero() {
   return (
     <section
@@ -402,6 +678,7 @@ function Hero() {
 }
 
 // ─── Vision Section ───────────────────────────────────────────
+
 function Vision() {
   return (
     <section id="vision" className="py-24" style={{ background: C.bg }}>
@@ -518,6 +795,7 @@ function Vision() {
 }
 
 // ─── Lessons Section ──────────────────────────────────────────
+
 function Lessons() {
   const lessons = [
     { icon: "🎹", title: "Piano", desc: "Classical, contemporary, and jazz piano for all ages and skill levels." },
@@ -593,6 +871,7 @@ function Lessons() {
 }
 
 // ─── Faculty Section ──────────────────────────────────────────
+
 function Faculty() {
   const [expanded, setExpanded] = useState<number | null>(null);
 
@@ -701,6 +980,7 @@ function Faculty() {
 }
 
 // ─── Spaces Section ───────────────────────────────────────────
+
 function Spaces() {
   const spaces = [
     {
@@ -781,6 +1061,7 @@ function Spaces() {
 }
 
 // ─── Contact Section ──────────────────────────────────────────
+
 function Contact({ onBookClick }: { onBookClick: () => void }) {
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -972,6 +1253,7 @@ function Contact({ onBookClick }: { onBookClick: () => void }) {
 }
 
 // ─── Footer ───────────────────────────────────────────────────
+
 function Footer() {
   return (
     <footer className="py-12" style={{ background: C.card, borderTop: `1px solid ${C.border}` }}>
@@ -1037,20 +1319,21 @@ function Footer() {
 }
 
 // ─── Main Page ────────────────────────────────────────────────
+
 export default function Home() {
   useReveal();
-  const [showCalendly, setShowCalendly] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
-      <Nav onBookClick={() => setShowCalendly(true)} />
-      <CalendlyModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} />
+      <Nav onBookClick={() => setShowBooking(true)} />
+      <BookingModal isOpen={showBooking} onClose={() => setShowBooking(false)} />
       <Hero />
       <Vision />
       <Lessons />
       <Faculty />
       <Spaces />
-      <Contact onBookClick={() => setShowCalendly(true)} />
+      <Contact onBookClick={() => setShowBooking(true)} />
       <Footer />
     </div>
   );
