@@ -621,10 +621,11 @@ function Hero() {
         <h1
           className="mb-4 leading-none"
           style={{
-            fontSize: "clamp(2.5rem, 6vw, 5.5rem)",
+            fontSize: "clamp(2rem, 5vw, 4rem)",
             fontWeight: 400,
             letterSpacing: "-0.01em",
             fontFamily: "'Cormorant Garamond', serif",
+            whiteSpace: "nowrap",
           }}
         >
           <span style={{ color: C.accent, fontStyle: "italic" }}>
