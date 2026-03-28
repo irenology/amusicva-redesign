@@ -11,7 +11,7 @@
 - [x] Navigation between booking types (lessons vs practice rooms)
 - [x] Practice Rooms and Performance Space image galleries (3 photos for Practice Rooms, 1 for Performance Space)
 - [x] Instagram link connected to official account
-- [x] Large logo and school name prominently displayed in Hero section
+- [x] Hero section redesigned with large logo, Fairfax location, and tagline hierarchy
 - [x] All 23 unit tests passing
 - [x] Responsive design across all sections
 

@@ -604,23 +604,22 @@ function Hero() {
       />
 
       <div className="container relative z-10 py-16 flex flex-col items-center text-center">
-        {/* Logo and School Name */}
-        <div className="mb-12 flex flex-col items-center">
+        {/* Logo */}
+        <div className="mb-8 flex flex-col items-center">
           <img
-            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/Screenshot2026-03-28at17.28.09_2f1a963e.png"
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/appassionata-logo-cream-bg_9ec466e4.png"
             alt="Appassionata Music School Logo"
-            className="mb-6"
             style={{
               maxWidth: "100%",
               height: "auto",
-              width: "clamp(200px, 50vw, 500px)",
+              width: "clamp(200px, 45vw, 450px)",
             }}
           />
         </div>
 
-        {/* Tag */}
+        {/* Location Tag */}
         <div
-          className="inline-flex items-center gap-2 mb-8 font-ui text-xs tracking-widest uppercase"
+          className="inline-flex items-center gap-2 mb-6 font-ui text-xs tracking-widest uppercase"
           style={{ color: C.accent, letterSpacing: "0.2em" }}
         >
           <span className="w-8 h-px" style={{ background: C.accent }} />
@@ -628,11 +627,11 @@ function Hero() {
           <span className="w-8 h-px" style={{ background: C.accent }} />
         </div>
 
-        {/* Headline */}
-        <h1
+        {/* Tagline - Smaller */}
+        <h2
           className="font-display mb-6 leading-none"
           style={{
-            fontSize: "clamp(3rem, 7vw, 6.5rem)",
+            fontSize: "clamp(1.8rem, 4vw, 3.2rem)",
             color: C.text,
             fontWeight: 300,
             letterSpacing: "-0.02em",
@@ -640,10 +639,10 @@ function Hero() {
         >
           Learn with Joy,
           <br />
-          <span style={{ color: C.accent, fontStyle: "italic", fontWeight: 500 }}>
+          <span style={{ color: C.accent, fontStyle: "italic", fontWeight: 400 }}>
             Play with Passion.
           </span>
-        </h1>
+        </h2>
 
         <p
           className="mb-10 max-w-xl leading-relaxed"
