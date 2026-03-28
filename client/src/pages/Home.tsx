@@ -96,9 +96,17 @@ function Divider() {
 
 // ─── Booking Modal ─────────────────────────────────────────────
 
-function BookingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [bookingType, setBookingType] = useState<"lesson" | "practice" | null>(null);
-  const [lessonData, setLessonData] = useState({ teacher: "", duration: "", name: "", email: "" });
+function BookingModal({ isOpen, onClose, preSelectedTeacher }: { isOpen: boolean; onClose: () => void; preSelectedTeacher?: string }) {
+  const [bookingType, setBookingType] = useState<"lesson" | "practice" | null>(preSelectedTeacher ? "lesson" : null);
+  const [selectedTeacher, setSelectedTeacher] = useState<string>(preSelectedTeacher || "");
+
+  useEffect(() => {
+    if (preSelectedTeacher) {
+      setBookingType("lesson");
+      setSelectedTeacher(preSelectedTeacher);
+    }
+  }, [preSelectedTeacher, isOpen]);
+  const [lessonData, setLessonData] = useState({ name: "", email: "", teacher: preSelectedTeacher || "", duration: "" });
   const [practiceData, setPracticeData] = useState({ type: "", hours: "", name: "", email: "" });
   const [submitted, setSubmitted] = useState(false);
 
@@ -796,7 +804,17 @@ function Vision() {
 
 // ─── Lessons Section ──────────────────────────────────────────
 
-function Lessons() {
+// Map lessons to teachers
+const lessonToTeacher: Record<string, string> = {
+  "Piano": "Norman Charette",
+  "Guitar & Ukulele": "Bogdan (Bobo) Pejić",
+  "Violin & Viola": "Vesna Pejić",
+  "Flute & Piccolo": "Erin McAfee",
+  "Electric Bass": "Teymour Saifi",
+  "Composition": "Bogdan (Bobo) Pejić",
+};
+
+function Lessons({ onLessonClick }: { onLessonClick: (teacher: string) => void }) {
   const lessons = [
     { icon: "🎹", title: "Piano", desc: "Classical, contemporary, and jazz piano for all ages and skill levels." },
     { icon: "🎸", title: "Guitar & Ukulele", desc: "Classical, jazz, tango, and contemporary guitar. Ukulele for all ages." },
@@ -838,12 +856,13 @@ function Lessons() {
           {lessons.map((lesson, i) => (
             <div
               key={i}
-              className="reveal p-8 rounded transition-all hover:shadow-lg"
+              className="reveal p-8 rounded transition-all hover:shadow-lg cursor-pointer"
               style={{
                 background: C.card,
                 border: `1px solid ${C.border}`,
                 transitionDelay: `${i * 0.04}s`,
               }}
+              onClick={() => onLessonClick(lessonToTeacher[lesson.title])}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = C.white;
                 e.currentTarget.style.borderColor = C.accent;
@@ -859,6 +878,9 @@ function Lessons() {
               </h3>
               <p style={{ color: C.muted, fontSize: "0.95rem", fontWeight: 300, lineHeight: "1.6" }}>
                 {lesson.desc}
+              </p>
+              <p style={{ color: C.accent, fontSize: "0.85rem", fontWeight: 500, marginTop: "1rem" }}>
+                → Click to book with {lessonToTeacher[lesson.title]}
               </p>
             </div>
           ))}
@@ -1318,22 +1340,28 @@ function Footer() {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────
+// ─── Main Page ──────────────────────────────────────────
 
 export default function Home() {
   useReveal();
-  const [showBooking, setShowBooking] = useState(false);
+  const [showCalendly, setShowCalendly] = useState(false);
+  const [preSelectedTeacher, setPreSelectedTeacher] = useState<string | undefined>();
+
+  const handleLessonClick = (teacher: string) => {
+    setPreSelectedTeacher(teacher);
+    setShowCalendly(true);
+  };
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
-      <Nav onBookClick={() => setShowBooking(true)} />
-      <BookingModal isOpen={showBooking} onClose={() => setShowBooking(false)} />
+      <Nav onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} />
+      <BookingModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} preSelectedTeacher={preSelectedTeacher} />
       <Hero />
       <Vision />
-      <Lessons />
+      <Lessons onLessonClick={handleLessonClick} />
       <Faculty />
       <Spaces />
-      <Contact onBookClick={() => setShowBooking(true)} />
+      <Contact onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} />
       <Footer />
     </div>
   );
