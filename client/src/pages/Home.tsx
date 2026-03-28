@@ -1016,16 +1016,26 @@ function Faculty() {
 // ─── Spaces Section ───────────────────────────────────────────
 
 function Spaces() {
+  const [expandedSpace, setExpandedSpace] = useState<number | null>(null);
+
   const spaces = [
     {
       title: "Practice Rooms",
       desc: "Professional practice rooms used by our faculty for lessons, available for individual rental. Equipped with quality instruments and acoustically treated.",
       features: ["Daily availability 6am–2am", "Acoustic treatment", "Quality instruments provided", "Flexible hourly rental"],
+      images: [
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=553,fit=crop/A3QOXG1bN1tJNqOp/screenshot_20250513_205155_photos-Yan14BQM49c4X9xV.jpg",
+      ],
     },
     {
       title: "Performance Space",
       desc: "Our elegant performance space is available for recitals, showcases, concerts, and private events. Perfect for student recitals or professional performances.",
       features: ["Concert-quality grand piano", "Professional lighting", "Ideal for recitals & events", "Rental inquiries welcome"],
+      images: [
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=932,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_005501641-YBgbgg63pnuxj3Ro.jpg",
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=512,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_010008888-Awv9vvVzM4S7ee4P.jpg",
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=563,fit=crop/A3QOXG1bN1tJNqOp/mmexport1747177511454-Aq2W7gQaarC2n1pJ.jpg",
+      ],
     },
   ];
 
@@ -1061,8 +1071,17 @@ function Spaces() {
           {spaces.map((space, i) => (
             <div key={i} className="reveal" style={{ transitionDelay: `${i * 0.08}s` }}>
               <div
-                className="p-8 rounded"
+                className="p-8 rounded cursor-pointer transition-all hover:shadow-lg"
                 style={{ background: C.card, border: `1px solid ${C.border}` }}
+                onClick={() => setExpandedSpace(expandedSpace === i ? null : i)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = C.white;
+                  e.currentTarget.style.borderColor = C.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = C.card;
+                  e.currentTarget.style.borderColor = C.border;
+                }}
               >
                 <h3 className="font-display text-2xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
                   {space.title}
@@ -1075,7 +1094,7 @@ function Spaces() {
                   {space.desc}
                 </p>
 
-                <ul className="space-y-2">
+                <ul className="space-y-2 mb-6">
                   {space.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-3">
                       <span style={{ color: C.accent, fontWeight: 600 }}>✓</span>
@@ -1083,7 +1102,62 @@ function Spaces() {
                     </li>
                   ))}
                 </ul>
+
+                <p style={{ color: C.accent, fontSize: "0.85rem", fontWeight: 500 }}>
+                  → Click to view {space.images.length} photo{space.images.length !== 1 ? "s" : ""}
+                </p>
               </div>
+
+              {/* Image Gallery Modal */}
+              {expandedSpace === i && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                  style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+                  onClick={() => setExpandedSpace(null)}
+                >
+                  <div
+                    className="relative w-full max-w-2xl rounded-lg overflow-hidden shadow-2xl"
+                    style={{ background: C.white, maxHeight: "90vh", overflowY: "auto" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div
+                      className="sticky top-0 flex items-center justify-between p-6 border-b"
+                      style={{ background: C.card, borderColor: C.border }}
+                    >
+                      <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
+                        {space.title}
+                      </h2>
+                      <button
+                        onClick={() => setExpandedSpace(null)}
+                        className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
+                        style={{ color: C.muted, background: "none", border: "none" }}
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
+
+                    {/* Gallery */}
+                    <div className="p-8">
+                      <div className="space-y-6">
+                        {space.images.map((img, idx) => (
+                          <div key={idx} className="rounded overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
+                            <img
+                              src={img}
+                              alt={`${space.title} ${idx + 1}`}
+                              className="w-full h-auto object-cover"
+                              style={{ maxHeight: "500px" }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <p style={{ color: C.muted, fontSize: "0.85rem", marginTop: "1rem", textAlign: "center" }}>
+                        {space.images.length} photo{space.images.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
