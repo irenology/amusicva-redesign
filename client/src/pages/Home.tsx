@@ -619,17 +619,19 @@ function Hero() {
 
         {/* School Name - Large Text */}
         <h1
-          className="font-display mb-4 leading-none"
+          className="mb-4 leading-none"
           style={{
             fontSize: "clamp(2.5rem, 6vw, 5.5rem)",
-            color: C.text,
             fontWeight: 400,
             letterSpacing: "-0.01em",
+            fontFamily: "'Cormorant Garamond', serif",
           }}
         >
-          Appassionata
-          <br />
-          <span style={{ color: C.accent, fontStyle: "normal", fontWeight: 400, fontSize: "0.75em" }}>
+          <span style={{ color: C.accent, fontStyle: "italic" }}>
+            Appassionata
+          </span>
+          {" "}
+          <span style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}>
             Music School of VA
           </span>
         </h1>
@@ -644,11 +646,11 @@ function Hero() {
           <span className="w-8 h-px" style={{ background: C.accent }} />
         </div>
 
-        {/* Headline - Original Size */}
+        {/* Headline - Smaller */}
         <h2
           className="font-display mb-6 leading-none"
           style={{
-            fontSize: "clamp(3rem, 7vw, 6.5rem)",
+            fontSize: "clamp(1.8rem, 4vw, 3.5rem)",
             color: C.text,
             fontWeight: 300,
             letterSpacing: "-0.02em",
