@@ -9,7 +9,8 @@
 - [x] Booking modal with teacher pre-selection from instrument cards
 - [x] Back button functionality in booking modal
 - [x] Navigation between booking types (lessons vs practice rooms)
-- [x] Practice Rooms and Performance Space image galleries (3 photos for Performance Space, 1 for Practice Rooms)
+- [x] Practice Rooms and Performance Space image galleries (3 photos for Practice Rooms, 1 for Performance Space)
+- [x] Instagram link connected to official account
 - [x] All 23 unit tests passing
 - [x] Responsive design across all sections
 

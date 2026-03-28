@@ -1024,7 +1024,9 @@ function Spaces() {
       desc: "Professional practice rooms used by our faculty for lessons, available for individual rental. Equipped with quality instruments and acoustically treated.",
       features: ["Daily availability 6am–2am", "Acoustic treatment", "Quality instruments provided", "Flexible hourly rental"],
       images: [
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=553,fit=crop/A3QOXG1bN1tJNqOp/screenshot_20250513_205155_photos-Yan14BQM49c4X9xV.jpg",
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=932,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_005501641-YBgbgg63pnuxj3Ro.jpg",
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=512,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_010008888-Awv9vvVzM4S7ee4P.jpg",
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=563,fit=crop/A3QOXG1bN1tJNqOp/mmexport1747177511454-Aq2W7gQaarC2n1pJ.jpg",
       ],
     },
     {
@@ -1032,9 +1034,7 @@ function Spaces() {
       desc: "Our elegant performance space is available for recitals, showcases, concerts, and private events. Perfect for student recitals or professional performances.",
       features: ["Concert-quality grand piano", "Professional lighting", "Ideal for recitals & events", "Rental inquiries welcome"],
       images: [
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=932,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_005501641-YBgbgg63pnuxj3Ro.jpg",
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=512,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_010008888-Awv9vvVzM4S7ee4P.jpg",
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=563,fit=crop/A3QOXG1bN1tJNqOp/mmexport1747177511454-Aq2W7gQaarC2n1pJ.jpg",
+        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=553,fit=crop/A3QOXG1bN1tJNqOp/screenshot_20250513_205155_photos-Yan14BQM49c4X9xV.jpg",
       ],
     },
   ];
@@ -1410,7 +1410,7 @@ function Footer() {
             © {new Date().getFullYear()} Appassionata Music School of Virginia. All rights reserved.
           </p>
           <a
-            href="https://www.instagram.com"
+            href="https://www.instagram.com/amusicschool?igsh=cjU5a3FtNXZ1eDhn"
             target="_blank"
             rel="noopener noreferrer"
             className="font-ui text-xs transition-colors"
