@@ -604,6 +604,20 @@ function Hero() {
       />
 
       <div className="container relative z-10 py-16 flex flex-col items-center text-center">
+        {/* Logo and School Name */}
+        <div className="mb-12 flex flex-col items-center">
+          <img
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/Screenshot2026-03-28at17.28.09_2f1a963e.png"
+            alt="Appassionata Music School Logo"
+            className="mb-6"
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              width: "clamp(200px, 50vw, 500px)",
+            }}
+          />
+        </div>
+
         {/* Tag */}
         <div
           className="inline-flex items-center gap-2 mb-8 font-ui text-xs tracking-widest uppercase"
