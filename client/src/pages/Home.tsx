@@ -185,9 +185,21 @@ function BookingModal({ isOpen, onClose, preSelectedTeacher }: { isOpen: boolean
           className="sticky top-0 flex items-center justify-between p-6 border-b"
           style={{ background: C.card, borderColor: C.border }}
         >
-          <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
-            {!bookingType ? "What would you like to book?" : bookingType === "lesson" ? "Book a Lesson" : "Rent a Practice Room"}
-          </h2>
+          <div className="flex items-center gap-4">
+            {bookingType && (
+              <button
+                onClick={() => setBookingType(null)}
+                className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
+                style={{ color: C.accent, background: "none", border: "none" }}
+                title="Go back to booking options"
+              >
+                <ChevronDown size={24} style={{ transform: "rotate(90deg)" }} />
+              </button>
+            )}
+            <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
+              {!bookingType ? "What would you like to book?" : bookingType === "lesson" ? "Book a Lesson" : "Rent a Practice Room"}
+            </h2>
+          </div>
           <button
             onClick={onClose}
             className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
