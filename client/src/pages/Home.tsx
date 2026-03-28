@@ -617,9 +617,26 @@ function Hero() {
           />
         </div>
 
+        {/* School Name - Large Text */}
+        <h1
+          className="font-display mb-4 leading-none"
+          style={{
+            fontSize: "clamp(2.5rem, 6vw, 5.5rem)",
+            color: C.text,
+            fontWeight: 400,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Appassionata
+          <br />
+          <span style={{ color: C.accent, fontStyle: "normal", fontWeight: 400, fontSize: "0.75em" }}>
+            Music School of VA
+          </span>
+        </h1>
+
         {/* Location Tag */}
         <div
-          className="inline-flex items-center gap-2 mb-6 font-ui text-xs tracking-widest uppercase"
+          className="inline-flex items-center gap-2 mb-8 font-ui text-xs tracking-widest uppercase"
           style={{ color: C.accent, letterSpacing: "0.2em" }}
         >
           <span className="w-8 h-px" style={{ background: C.accent }} />
@@ -627,11 +644,11 @@ function Hero() {
           <span className="w-8 h-px" style={{ background: C.accent }} />
         </div>
 
-        {/* Tagline - Smaller */}
+        {/* Headline - Original Size */}
         <h2
           className="font-display mb-6 leading-none"
           style={{
-            fontSize: "clamp(1.8rem, 4vw, 3.2rem)",
+            fontSize: "clamp(3rem, 7vw, 6.5rem)",
             color: C.text,
             fontWeight: 300,
             letterSpacing: "-0.02em",
@@ -639,7 +656,7 @@ function Hero() {
         >
           Learn with Joy,
           <br />
-          <span style={{ color: C.accent, fontStyle: "italic", fontWeight: 400 }}>
+          <span style={{ color: C.accent, fontStyle: "italic", fontWeight: 500 }}>
             Play with Passion.
           </span>
         </h2>
