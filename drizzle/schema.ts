@@ -56,3 +56,40 @@ export const practiceRoomBookings = mysqlTable("practice_room_bookings", {
 
 export type PracticeRoomBooking = typeof practiceRoomBookings.$inferSelect;
 export type InsertPracticeRoomBooking = typeof practiceRoomBookings.$inferInsert;
+// Practice Room Calendar Bookings (for self-service booking system)
+export const practiceRoomCalendarBookings = mysqlTable("practice_room_calendar_bookings", {
+  id: int("id").autoincrement().primaryKey(),
+  studentName: varchar("student_name", { length: 255 }).notNull(),
+  studentEmail: varchar("student_email", { length: 320 }).notNull(),
+  studentPhone: varchar("student_phone", { length: 20 }),
+  bookingDate: varchar("booking_date", { length: 10 }).notNull(), // YYYY-MM-DD format
+  startTime: varchar("start_time", { length: 5 }).notNull(), // HH:MM format
+  endTime: varchar("end_time", { length: 5 }).notNull(), // HH:MM format
+  durationHours: int("duration_hours").notNull(),
+  roomType: varchar("room_type", { length: 100 }).notNull(), // standard or premium
+  status: mysqlEnum("status", ["pending", "confirmed", "cancelled"]).default("pending").notNull(),
+  accessToken: varchar("access_token", { length: 64 }).notNull().unique(), // Private URL token
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PracticeRoomCalendarBooking = typeof practiceRoomCalendarBookings.$inferSelect;
+export type InsertPracticeRoomCalendarBooking = typeof practiceRoomCalendarBookings.$inferInsert;
+
+// Events Table
+export const events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  eventDate: varchar("event_date", { length: 10 }).notNull(), // YYYY-MM-DD format
+  eventTime: varchar("event_time", { length: 5 }), // HH:MM format
+  venue: varchar("venue", { length: 255 }),
+  eventType: mysqlEnum("event_type", ["upcoming", "past"]).notNull(),
+  imageUrl: text("image_url"),
+  videoUrl: text("video_url"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Event = typeof events.$inferSelect;
+export type InsertEvent = typeof events.$inferInsert;

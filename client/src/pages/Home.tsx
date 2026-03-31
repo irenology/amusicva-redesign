@@ -1208,6 +1208,224 @@ function Spaces() {
   );
 }
 
+// ─── Payment Information Section ──────────────────────────────
+
+function PaymentInfo() {
+  return (
+    <section id="payment" className="py-24" style={{ background: C.card }}>
+      <div className="container">
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
+            style={{ color: C.accent, letterSpacing: "0.2em" }}
+          >
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+            Pricing & Trial
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+          </div>
+
+          <h2
+            className="font-display mb-6 leading-tight"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              color: C.text,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Flexible Lessons
+            <br />
+            <span style={{ color: C.accent, fontStyle: "italic" }}>for Every Budget.</span>
+          </h2>
+        </div>
+
+        <div className="max-w-2xl mx-auto">
+          <div
+            className="p-8 rounded"
+            style={{
+              background: C.white,
+              border: `1px solid ${C.border}`,
+              textAlign: "center",
+            }}
+          >
+            <p
+              className="mb-6 leading-relaxed"
+              style={{ color: C.textMid, fontSize: "1.05rem", fontWeight: 300 }}
+            >
+              We offer flexible lesson packages tailored to your musical goals and schedule. Whether you're a beginner exploring music for the first time or an advanced student preparing for performances, we have options for you.
+            </p>
+
+            <div
+              className="p-6 rounded mb-6"
+              style={{
+                background: `${C.accent}08`,
+                border: `1px solid ${C.accent}20`,
+                borderLeft: `4px solid ${C.accent}`,
+              }}
+            >
+              <p style={{ color: C.text, fontSize: "1rem", fontWeight: 500, marginBottom: "0.5rem" }}>
+                Interested in a Trial Lesson?
+              </p>
+              <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}>
+                Please contact us at{" "}
+                <a
+                  href="mailto:appassionatava@gmail.com"
+                  style={{ color: C.accent, textDecoration: "none", fontWeight: 500 }}
+                >
+                  appassionatava@gmail.com
+                </a>
+                {" "}for trial session information and pricing details.
+              </p>
+            </div>
+
+            <p style={{ color: C.muted, fontSize: "0.9rem", fontWeight: 300 }}>
+              Our team will work with you to create a customized learning plan that fits your needs, schedule, and budget.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+    </section>
+  );
+}
+
+// ─── Events Section ──────────────────────────────────────────────
+
+function Events() {
+  const upcomingEvents = [
+    {
+      title: "East Meets West Spring Concert 2025",
+      date: "April 20, 2025",
+      time: "3:00 PM",
+      venue: "Fairfax, Virginia",
+      description: "Join us for an evening of beautiful music featuring our talented students and faculty.",
+    },
+  ];
+
+  const pastEvents = [
+    {
+      title: "Winter Recital 2024",
+      date: "December 15, 2024",
+      description: "A wonderful showcase of our students' progress and musical achievements.",
+    },
+    {
+      title: "Fall Open House",
+      date: "September 28, 2024",
+      description: "Meet our faculty, tour our studios, and experience the Appassionata community.",
+    },
+  ];
+
+  return (
+    <section id="events" className="py-24" style={{ background: C.bg }}>
+      <div className="container">
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
+            style={{ color: C.accent, letterSpacing: "0.2em" }}
+          >
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+            Events & Recitals
+            <span className="w-4 h-px" style={{ background: C.accent }} />
+          </div>
+
+          <h2
+            className="font-display mb-6 leading-tight"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              color: C.text,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Celebrate Music
+            <br />
+            <span style={{ color: C.accent, fontStyle: "italic" }}>Together.</span>
+          </h2>
+        </div>
+
+        {/* Upcoming Events */}
+        <div className="mb-16">
+          <h3
+            className="font-display text-2xl mb-8 text-center"
+            style={{ color: C.text, fontWeight: 500 }}
+          >
+            Upcoming Events
+          </h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            {upcomingEvents.map((event, i) => (
+              <div
+                key={i}
+                className="reveal p-8 rounded"
+                style={{
+                  background: C.card,
+                  border: `1px solid ${C.border}`,
+                  transitionDelay: `${i * 0.04}s`,
+                }}
+              >
+                <h4 className="font-display text-xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+                  {event.title}
+                </h4>
+                <div className="space-y-2 mb-4">
+                  <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}>
+                    <strong>Date:</strong> {event.date}
+                  </p>
+                  {event.time && (
+                    <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}>
+                      <strong>Time:</strong> {event.time}
+                    </p>
+                  )}
+                  <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300 }}>
+                    <strong>Location:</strong> {event.venue}
+                  </p>
+                </div>
+                <p style={{ color: C.muted, fontSize: "0.9rem", fontWeight: 300, lineHeight: "1.6" }}>
+                  {event.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Past Events */}
+        <div>
+          <h3
+            className="font-display text-2xl mb-8 text-center"
+            style={{ color: C.text, fontWeight: 500 }}
+          >
+            Past Events
+          </h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            {pastEvents.map((event, i) => (
+              <div
+                key={i}
+                className="reveal p-8 rounded"
+                style={{
+                  background: `${C.accent}05`,
+                  border: `1px solid ${C.border}`,
+                  transitionDelay: `${i * 0.04}s`,
+                }}
+              >
+                <h4 className="font-display text-xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+                  {event.title}
+                </h4>
+                <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300, marginBottom: "1rem" }}>
+                  <strong>Date:</strong> {event.date}
+                </p>
+                <p style={{ color: C.muted, fontSize: "0.9rem", fontWeight: 300, lineHeight: "1.6" }}>
+                  {event.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+    </section>
+  );
+}
+
 // ─── Contact Section ──────────────────────────────────────────
 
 function Contact({ onBookClick }: { onBookClick: () => void }) {
@@ -1487,6 +1705,8 @@ export default function Home() {
       <Lessons onLessonClick={handleLessonClick} />
       <Faculty />
       <Spaces />
+      <PaymentInfo />
+      <Events />
       <Contact onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} />
       <Footer />
     </div>

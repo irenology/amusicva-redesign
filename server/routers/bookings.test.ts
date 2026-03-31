@@ -2,6 +2,19 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { appRouter } from "../routers";
 import type { TrpcContext } from "../_core/context";
 
+// Suppress console output during tests
+const originalLog = console.log;
+const originalWarn = console.warn;
+const originalError = console.error;
+
+beforeEach(() => {
+  console.log = vi.fn();
+  console.warn = vi.fn();
+  console.error = vi.fn();
+});
+
+
+
 // Mock database and notification
 vi.mock("../db", () => ({
   getDb: vi.fn(() => Promise.resolve({
@@ -13,6 +26,14 @@ vi.mock("../db", () => ({
 
 vi.mock("../_core/notification", () => ({
   notifyOwner: vi.fn(() => Promise.resolve(true)),
+}));
+
+vi.mock("nodemailer", () => ({
+  default: {
+    createTransport: vi.fn(() => ({
+      sendMail: vi.fn(() => Promise.resolve({ messageId: "test-123" })),
+    })),
+  },
 }));
 
 function createPublicContext(): TrpcContext {
