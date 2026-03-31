@@ -42,9 +42,9 @@
 - [x] Events section
   - [x] Upcoming events (East Meets West Spring Concert 2025)
   - [x] Past events gallery with descriptions
-- [ ] Hire Our Musicians section
-  - [ ] Musician profiles for event bookings
-  - [ ] Contact form for inquiries
+- [x] Hire Our Musicians section
+  - [x] Musician profiles for event bookings
+  - [x] Contact form for inquiries
 - [ ] DNS migration to point amusicva.com to new website (requires Norman's approval)
 
 ## Technical Notes
