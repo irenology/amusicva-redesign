@@ -1067,7 +1067,9 @@ function Spaces() {
       desc: "Our elegant performance space is available for recitals, showcases, concerts, and private events. Perfect for student recitals or professional performances.",
       features: ["Concert-quality grand piano", "Professional lighting", "Ideal for recitals & events", "Rental inquiries welcome"],
       images: [
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=553,fit=crop/A3QOXG1bN1tJNqOp/screenshot_20250513_205155_photos-Yan14BQM49c4X9xV.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/7ddc50ec65c63d4823019d35b73dfb7a_6bf022d8.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/c583cc6175f9e204799c5fd5b1d20e67_9a23f4ed.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/044c4b063bb47941ca146ae241ce4c96_79b8953c.jpg",
       ],
     },
   ];
