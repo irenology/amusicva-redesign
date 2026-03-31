@@ -6,13 +6,13 @@ import { notifyOwner } from "../_core/notification";
 import { invokeLLM } from "../_core/llm";
 import nodemailer from "nodemailer";
 
-// Email transporter using Manus built-in email service
+// Email transporter using Gmail SMTP
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.manus.im",
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: parseInt(process.env.SMTP_PORT || "587"),
   secure: process.env.SMTP_SECURE === "true",
   auth: {
-    user: process.env.SMTP_USER || "noreply@manus.im",
+    user: process.env.SMTP_USER || "",
     pass: process.env.SMTP_PASS || "",
   },
 });
@@ -23,49 +23,124 @@ async function sendConfirmationEmail(
   bookingType: "lesson" | "practice",
   details: Record<string, string>
 ) {
+  // Verify SMTP configuration
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("[Email] SMTP configuration incomplete, skipping email send");
+    return;
+  }
+
   const subject =
     bookingType === "lesson"
-      ? "Your Lesson Booking Request - Appassionata Music School"
-      : "Your Practice Room Booking Request - Appassionata Music School";
+      ? "Lesson Booking Confirmation - Appassionata Music School"
+      : "Practice Room Booking Confirmation - Appassionata Music School";
 
   const htmlContent =
     bookingType === "lesson"
       ? `
-        <h2>Thank you for booking a lesson!</h2>
-        <p>Hi ${studentName},</p>
-        <p>We've received your booking request for a ${details.duration}-minute lesson with ${details.teacher}.</p>
-        <p><strong>Booking Details:</strong></p>
-        <ul>
-          <li>Teacher: ${details.teacher}</li>
-          <li>Duration: ${details.duration} minutes</li>
-          <li>Pricing: Please contact us for details</li>
-        </ul>
-        <p>We'll be in touch shortly to confirm your lesson time and discuss pricing.</p>
-        <p>Contact us: <a href="mailto:appassionatava@gmail.com">appassionatava@gmail.com</a></p>
-        <p>Best regards,<br/>Appassionata Music School of Virginia</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #B8860B; color: white; padding: 20px; text-align: center; border-radius: 5px; }
+            .content { padding: 20px; background-color: #f9f9f9; }
+            .details { background-color: white; padding: 15px; border-left: 4px solid #B8860B; margin: 15px 0; }
+            .footer { text-align: center; padding-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Lesson Booking Confirmation</h1>
+            </div>
+            <div class="content">
+              <p>Dear ${studentName},</p>
+              <p>Thank you for choosing Appassionata Music School! We are delighted to confirm that we have received your lesson booking request.</p>
+              
+              <div class="details">
+                <h3>Booking Details</h3>
+                <p><strong>Teacher:</strong> ${details.teacher}</p>
+                <p><strong>Duration:</strong> ${details.duration} minutes</p>
+                <p><strong>Status:</strong> Pending Confirmation</p>
+              </div>
+              
+              <p>Our team will contact you shortly to confirm your preferred lesson time and discuss pricing options. We look forward to helping you achieve your musical goals!</p>
+              
+              <p>If you have any questions or need to reschedule, please don't hesitate to reach out to us.</p>
+              
+              <p><strong>Contact Information:</strong><br>
+              Email: <a href="mailto:appassionatava@gmail.com">appassionatava@gmail.com</a></p>
+              
+              <p>Best regards,<br>
+              <strong>Appassionata Music School of Virginia</strong><br>
+              Fairfax, Virginia</p>
+            </div>
+            <div class="footer">
+              <p>This is an automated message. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
       `
       : `
-        <h2>Thank you for booking a practice room!</h2>
-        <p>Hi ${studentName},</p>
-        <p>We've received your booking request for ${details.hours} hours in our ${details.roomType} practice room.</p>
-        <p><strong>Booking Details:</strong></p>
-        <ul>
-          <li>Room Type: ${details.roomType}</li>
-          <li>Hours: ${details.hours}</li>
-          <li>Pricing: Please contact us for details</li>
-        </ul>
-        <p>We'll be in touch shortly to confirm your room availability and discuss pricing.</p>
-        <p>Contact us: <a href="mailto:appassionatava@gmail.com">appassionatava@gmail.com</a></p>
-        <p>Best regards,<br/>Appassionata Music School of Virginia</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #B8860B; color: white; padding: 20px; text-align: center; border-radius: 5px; }
+            .content { padding: 20px; background-color: #f9f9f9; }
+            .details { background-color: white; padding: 15px; border-left: 4px solid #B8860B; margin: 15px 0; }
+            .footer { text-align: center; padding-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Practice Room Booking Confirmation</h1>
+            </div>
+            <div class="content">
+              <p>Dear ${studentName},</p>
+              <p>Thank you for choosing Appassionata Music School! We are pleased to confirm that we have received your practice room booking request.</p>
+              
+              <div class="details">
+                <h3>Booking Details</h3>
+                <p><strong>Room Type:</strong> ${details.roomType === 'premium' ? 'Premium Practice Room' : 'Standard Practice Room'}</p>
+                <p><strong>Duration:</strong> ${details.hours} hour(s)</p>
+                <p><strong>Status:</strong> Pending Confirmation</p>
+              </div>
+              
+              <p>Our team will contact you shortly to confirm your preferred time slot and discuss pricing. We maintain state-of-the-art practice facilities to support your musical development.</p>
+              
+              <p>If you have any questions or need to reschedule, please don't hesitate to reach out to us.</p>
+              
+              <p><strong>Contact Information:</strong><br>
+              Email: <a href="mailto:appassionatava@gmail.com">appassionatava@gmail.com</a></p>
+              
+              <p>Best regards,<br>
+              <strong>Appassionata Music School of Virginia</strong><br>
+              Fairfax, Virginia</p>
+            </div>
+            <div class="footer">
+              <p>This is an automated message. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
       `;
 
   try {
     await transporter.sendMail({
-      from: '"Appassionata Music School" <appassionatava@gmail.com>',
+      from: `"${process.env.SMTP_FROM_NAME || 'Appassionata Music School'}" <${process.env.SMTP_FROM_EMAIL || 'appassionatava@gmail.com'}>`,
       to: studentEmail,
       subject,
       html: htmlContent,
     });
+    console.log(`[Email] Confirmation email sent to ${studentEmail}`);
   } catch (error) {
     console.error("Failed to send confirmation email:", error);
     // Don't throw - booking should still succeed even if email fails
