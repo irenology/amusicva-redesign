@@ -35,30 +35,35 @@ const faculty = [
     name: "Norman Charette",
     instrument: "Piano",
     short: "DMA Candidate, Indiana University MM. Faculty at College of William & Mary. Performed across the US and in China's 2024 China-US Youth Festival.",
+    long: "Norman Charette is an accomplished pianist and dedicated music educator with a passion for nurturing the next generation of musicians. Currently pursuing his Doctor of Musical Arts degree at Indiana University, Norman holds a Master of Music degree and serves as faculty at the College of William & Mary. His performance career spans across the United States and internationally, including a memorable performance at China's 2024 China-US Youth Festival. Norman specializes in classical piano instruction for students of all ages and levels, from beginners to advanced performers. His teaching philosophy emphasizes technical excellence, musical expression, and the joy of making music. Norman is committed to helping each student develop their unique musical voice while building a strong foundation in piano technique and music theory.",
     unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/20250505_164140---zoomed---pop---shadow-removed-YZ98qkboDRFaq67p.jpg",
   },
   {
     name: "Bogdan (Bobo) Pejić",
     instrument: "Guitar, Ukulele & Composition",
     short: "Internationally acclaimed guitarist with 1,400+ concerts across Europe and South America. Founding member of Beltango Quinteto.",
+    long: "Bogdan Pejić, known affectionately as Bobo, is an internationally acclaimed guitarist and composer with an extraordinary performance history. With over 1,400 concerts performed across Europe and South America, Bobo has established himself as a virtuoso musician and compelling performer. He is the founding member of Beltango Quinteto, a renowned ensemble known for their innovative interpretations of tango and world music. Bobo's expertise spans classical guitar, contemporary composition, and world music traditions. His teaching approach combines technical mastery with creative expression, encouraging students to explore their own musical voice. Whether teaching beginners or advanced students, Bobo brings decades of international performance experience and a deep understanding of musical storytelling to every lesson.",
     unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/dsc04692~2-AoPJebP3vySaZOpR.jpg",
   },
   {
     name: "Vesna Pejić",
     instrument: "Violin, Viola & Ukulele",
     short: "Professional violist and violinist with 20+ years of experience. Performed with orchestras across Europe including Austria, France, Italy, Spain, and Sweden.",
+    long: "Vesna Pejić is a distinguished violinist and violist with over 20 years of professional performance experience. Her career has taken her across Europe, performing with prestigious orchestras in Austria, France, Italy, Spain, and Sweden. Vesna's versatility as a musician is evident in her mastery of multiple instruments, including violin, viola, and ukulele. Her deep understanding of classical music traditions combined with her openness to diverse musical styles makes her an exceptional educator. Vesna is passionate about sharing her love of music with students of all ages and abilities. Her teaching emphasizes proper technique, musical interpretation, and the development of a strong ear. Students working with Vesna benefit from her international performance experience and her commitment to helping each student achieve their musical goals.",
     unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/fb_img_1739448270556-mv0Jjby5X3F0vPbO.jpg",
   },
   {
     name: "Erin McAfee",
     instrument: "Flute & Piccolo",
     short: "DC-based flutist, winner of the 2025 UW Wind Ensemble concerto competition. Member of the prestigious DCFlutes ensemble.",
+    long: "Erin McAfee is a talented flutist and piccolo player based in Washington, DC. She is the winner of the 2025 UW Wind Ensemble concerto competition and an active member of the prestigious DCFlutes ensemble, a collective of accomplished flutists dedicated to advancing flute music in the DC region. Erin's performance experience includes both classical and contemporary music, and she is committed to expanding the flute repertoire. As an educator, Erin brings enthusiasm, technical expertise, and a genuine love for the flute to her teaching. She works with students from beginner to advanced levels, helping them develop proper embouchure, tone production, and musical expression. Erin believes that learning the flute should be an enjoyable and rewarding experience, and she tailors her teaching to each student's individual needs and musical interests.",
     unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/erin-mcafee-1-A1azw0DnWBu5GgkQ.jpeg",
   },
   {
     name: "Teymour Saifi",
     instrument: "Electric Bass",
     short: "DC-based bassist, composer, and educator. Georgetown University music theory and performance studies. Performs across rock, ambient, and experimental genres.",
+    long: "Teymour Saifi is a versatile musician, composer, and educator based in Washington, DC. With formal training in music theory and performance from Georgetown University, Teymour has developed a comprehensive understanding of music across multiple genres. His performance experience spans rock, ambient, experimental, and world music traditions, making him a truly eclectic musician. As a bassist, Teymour is known for his solid groove, innovative approaches to harmony, and ability to adapt to any musical context. His compositional work reflects his diverse musical influences and his commitment to pushing creative boundaries. As an educator, Teymour brings a wealth of knowledge and a passion for helping students discover their own musical voice. He teaches electric bass, music theory, and composition to students of all levels, emphasizing both technical proficiency and creative expression.",
     unsplash: "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=763,fit=crop/A3QOXG1bN1tJNqOp/teymour-saifi-1-jpeg-m7VDw0bQVLSqo8zY.jpg",
   },
 ];
@@ -1035,7 +1040,7 @@ function Faculty() {
               </button>
             </div>
             <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300, lineHeight: "1.7" }}>
-              {faculty[expanded].short}
+              {faculty[expanded].long || faculty[expanded].short}
             </p>
           </div>
         )}
