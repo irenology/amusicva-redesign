@@ -93,3 +93,19 @@ export const events = mysqlTable("events", {
 
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = typeof events.$inferInsert;
+
+// Blocked Time Slots Table
+export const blockedTimeSlots = mysqlTable("blocked_time_slots", {
+  id: int("id").autoincrement().primaryKey(),
+  blockDate: varchar("block_date", { length: 10 }).notNull(),
+  startTime: varchar("start_time", { length: 5 }).notNull(),
+  endTime: varchar("end_time", { length: 5 }).notNull(),
+  reason: text("reason"),
+  roomType: varchar("room_type", { length: 100 }),
+  createdBy: int("created_by").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BlockedTimeSlot = typeof blockedTimeSlots.$inferSelect;
+export type InsertBlockedTimeSlot = typeof blockedTimeSlots.$inferInsert;

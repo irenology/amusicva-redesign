@@ -150,3 +150,51 @@
   - [x] getAllLessonBookings (admin only)
   - [x] getAllPracticeRoomBookings (admin only)
 - [x] All 23 tests passing
+
+
+## New Sprint - Admin Booking Management (In Progress)
+
+### Cancel/Reschedule Bookings
+- [ ] Add cancel button to each booking in admin dashboard
+- [ ] Add reschedule button to each booking in admin dashboard
+- [ ] Create cancel confirmation modal
+- [ ] Create reschedule modal with date/time picker
+- [ ] Update booking status in database (cancelled, rescheduled)
+- [ ] Send notification emails to students when booking is cancelled/rescheduled
+- [ ] Backend procedures:
+  - [ ] cancelBooking (admin only)
+  - [ ] rescheduleBooking (admin only)
+
+### Block Time Slots
+- [ ] Create "Block Time Slots" interface in admin dashboard
+- [ ] Add modal to block specific date/time ranges
+- [ ] Create blockedTimeSlots database table
+- [ ] Backend procedures:
+  - [ ] blockTimeSlot (admin only)
+  - [ ] unblockTimeSlot (admin only)
+  - [ ] getBlockedTimeSlots
+- [ ] Prevent new bookings during blocked times
+- [ ] Display blocked times in calendar view
+
+## Admin Booking Management Features ✅ COMPLETED
+
+### Cancel/Reschedule Bookings ✅
+- [x] Add cancel button to each booking in admin dashboard
+- [x] Add reschedule button to each booking in admin dashboard
+- [x] Update booking status in database (cancelled, rescheduled)
+- [x] Backend procedures:
+  - [x] cancelLessonBooking (admin only)
+  - [x] cancelPracticeRoomBooking (admin only)
+  - [x] rescheduleLessonBooking (admin only)
+  - [x] reschedulePracticeRoomBooking (admin only)
+
+### Block Time Slots ✅
+- [x] Create "Block Time Slots" interface in admin dashboard
+- [x] Add modal to block specific date/time ranges
+- [x] Create blockedTimeSlots database table
+- [x] Backend procedures:
+  - [x] blockTimeSlot (admin only)
+  - [x] unblockTimeSlot (admin only)
+  - [x] getBlockedTimeSlots
+- [x] Display blocked times in admin dashboard
+- [x] Admin can view, create, and delete blocked time slots

@@ -2,7 +2,8 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
-import { lessonBookings, practiceRoomBookings } from "../../drizzle/schema";
+import { lessonBookings, practiceRoomBookings, blockedTimeSlots } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
 import { invokeLLM } from "../_core/llm";
 import nodemailer from "nodemailer";
@@ -256,4 +257,150 @@ export const bookingsRouter = router({
     const bookings = await db.select().from(practiceRoomBookings);
     return bookings;
   }),
+
+  // Admin: Cancel lesson booking
+  cancelLessonBooking: protectedProcedure
+    .input(z.object({ bookingId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db
+        .update(lessonBookings)
+        .set({ status: "cancelled" })
+        .where(eq(lessonBookings.id, input.bookingId));
+
+      return { success: true, message: "Lesson booking cancelled" };
+    }),
+
+  // Admin: Cancel practice room booking
+  cancelPracticeRoomBooking: protectedProcedure
+    .input(z.object({ bookingId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db
+        .update(practiceRoomBookings)
+        .set({ status: "cancelled" })
+        .where(eq(practiceRoomBookings.id, input.bookingId));
+
+      return { success: true, message: "Practice room booking cancelled" };
+    }),
+
+  // Admin: Reschedule lesson booking
+  rescheduleLessonBooking: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.number(),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db
+        .update(lessonBookings)
+        .set({ status: "confirmed", notes: input.notes })
+        .where(eq(lessonBookings.id, input.bookingId));
+
+      return { success: true, message: "Lesson booking rescheduled" };
+    }),
+
+  // Admin: Reschedule practice room booking
+  reschedulePracticeRoomBooking: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.number(),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db
+        .update(practiceRoomBookings)
+        .set({ status: "confirmed", notes: input.notes })
+        .where(eq(practiceRoomBookings.id, input.bookingId));
+
+      return { success: true, message: "Practice room booking rescheduled" };
+    }),
+
+  // Admin: Block time slot
+  blockTimeSlot: protectedProcedure
+    .input(
+      z.object({
+        blockDate: z.string(),
+        startTime: z.string(),
+        endTime: z.string(),
+        reason: z.string().optional(),
+        roomType: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db.insert(blockedTimeSlots).values({
+        blockDate: input.blockDate,
+        startTime: input.startTime,
+        endTime: input.endTime,
+        reason: input.reason,
+        roomType: input.roomType,
+        createdBy: ctx.user.id,
+      });
+
+      return { success: true, message: "Time slot blocked" };
+    }),
+
+  // Admin: Get all blocked time slots
+  getBlockedTimeSlots: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user?.role !== "admin") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+    }
+
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const slots = await db.select().from(blockedTimeSlots);
+    return slots;
+  }),
+
+  // Admin: Unblock time slot
+  unblockTimeSlot: protectedProcedure
+    .input(z.object({ slotId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      await db.delete(blockedTimeSlots).where(eq(blockedTimeSlots.id, input.slotId));
+
+      return { success: true, message: "Time slot unblocked" };
+    }),
 });
