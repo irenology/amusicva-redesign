@@ -43,8 +43,8 @@ export default function AdminLogin() {
         return;
       }
 
-      // Login successful, redirect to dashboard
-      setLocation("/admin/dashboard");
+      // Login successful - use hard redirect to force auth state refresh
+      window.location.href = "/admin/dashboard";
     } catch (err) {
       setError("An error occurred. Please try again.");
       setIsLoading(false);
