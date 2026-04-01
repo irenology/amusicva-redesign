@@ -1554,9 +1554,9 @@ function Spaces({ onPracticeRoomClick }: { onPracticeRoomClick: () => void }) {
       desc: "Professional practice rooms used by our faculty for lessons, available for individual rental. Equipped with quality instruments and acoustically treated.",
       features: ["Daily availability 6am–2am", "Acoustic treatment", "Quality instruments provided", "Flexible hourly rental"],
       images: [
-        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-1-YBgbgg63pnuxj3Ro.jpg",
-        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-2-Awv9vvVzM4S7ee4P.jpg",
-        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-3-Aq2W7gQaarC2n1pJ.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/p1_e8a4db33.avif",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/p2_1b203e5a.avif",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/p3_38358445.avif",
       ],
     },
     {
