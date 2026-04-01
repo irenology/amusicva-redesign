@@ -5,9 +5,7 @@ import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { sdk } from "./_core/sdk";
-
-const COOKIE_NAME = "app_session_id";
-const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 export const adminLoginRoute = express.Router();
 
@@ -58,9 +56,17 @@ adminLoginRoute.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    // Use a special "admin:email" prefix so the session resolver knows to look up by email
-    const sessionIdentifier = `admin:${foundUser.email}`;
-    const sessionToken = await sdk.createSessionToken(sessionIdentifier, {
+    // Ensure the user has an openId set (use email as openId for admin users).
+    // This allows the standard getUserByOpenId() lookup to work in authenticateRequest.
+    const openId = foundUser.openId || `admin_email_${foundUser.email}`;
+    if (!foundUser.openId) {
+      await db
+        .update(users)
+        .set({ openId })
+        .where(eq(users.email, email));
+    }
+
+    const sessionToken = await sdk.createSessionToken(openId, {
       name: (foundUser.name || foundUser.email) as string,
     });
 
