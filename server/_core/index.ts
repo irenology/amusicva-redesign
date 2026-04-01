@@ -8,8 +8,48 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { adminLoginRoute } from "../admin-login-route";
-import { seedAdminsRoute } from "../seed-admins-route";
-import { runStartupMigration } from "../startup-migration";
+import { hash } from "bcryptjs";
+import { eq } from "drizzle-orm";
+import { getDb } from "../db";
+import { users } from "../../drizzle/schema";
+
+// Admin accounts that must always exist
+const REQUIRED_ADMINS = [
+  { email: "admin@amusicva.com", password: "12345678", name: "Admin" },
+  { email: "appassionatava@gmail.com", password: "12345678", name: "Appassionata Admin" },
+  { email: "Norman.Charette@gmail.com", password: "12345678", name: "Norman Charette" },
+  { email: "Norman@amusicva.com", password: "12345678", name: "Norman" },
+];
+
+async function ensureAdminAccounts() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Startup] DB not available, skipping admin account setup");
+    return;
+  }
+  for (const admin of REQUIRED_ADMINS) {
+    try {
+      const existing = await db.select().from(users).where(eq(users.email, admin.email)).limit(1);
+      const hashedPw = await hash(admin.password, 10);
+      if (existing.length === 0) {
+        await db.insert(users).values({
+          email: admin.email,
+          password: hashedPw,
+          role: "admin",
+          name: admin.name,
+          loginMethod: "email",
+          lastSignedIn: new Date(),
+        });
+        console.log(`[Startup] Created admin: ${admin.email}`);
+      } else if (existing[0].role !== "admin" || !existing[0].password) {
+        await db.update(users).set({ role: "admin", password: hashedPw }).where(eq(users.email, admin.email));
+        console.log(`[Startup] Fixed admin: ${admin.email}`);
+      }
+    } catch (err) {
+      console.error(`[Startup] Error setting up ${admin.email}:`, err);
+    }
+  }
+}
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,21 +71,15 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
-  // Run startup migration to ensure admin accounts exist
-  await runStartupMigration();
+  // Ensure all admin accounts exist before serving requests
+  await ensureAdminAccounts();
 
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
-  // Admin login endpoint
   app.use("/api/admin-login", adminLoginRoute);
-  // One-time admin seeding endpoint (protected by secret)
-  app.use("/api/seed-admins", seedAdminsRoute);
-  // tRPC API
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -53,7 +87,6 @@ async function startServer() {
       createContext,
     })
   );
-  // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
