@@ -316,3 +316,33 @@
 - [x] Fix three Practice Room images display
 - [x] Ensure Book Now button opens Book a Practice Room form
 - [x] Verify form submission works correctly
+
+
+## Current Sprint - Practice Room Booking System Enhancement (In Progress)
+
+### Form Validation & Feedback
+- [ ] Add real-time field validation in PracticeRoomBookingModal
+- [ ] Show error messages for empty required fields
+- [ ] Add success/error toast notifications
+- [ ] Validate email format before submission
+
+### Database & Backend Integration
+- [ ] Create practice_room_bookings table in schema (if not exists)
+- [ ] Add booking fields: studentName, studentEmail, roomType, hours, preferredDate, preferredTime
+- [ ] Create db helper for inserting bookings
+- [ ] Create tRPC procedure for submitPracticeRoomBooking
+- [ ] Add error handling for duplicate bookings
+
+### Email Notifications
+- [ ] Set up email service integration (use existing SMTP config)
+- [ ] Create booking confirmation email template
+- [ ] Send email after successful booking submission
+- [ ] Include booking details in email (date, time, duration, membership tier, etc)
+- [ ] Add owner notification for new bookings
+
+### Testing & Deployment
+- [ ] Test form validation with various inputs
+- [ ] Test database insertion and retrieval
+- [ ] Test email sending with real addresses
+- [ ] Verify end-to-end booking flow
+- [ ] All tests passing
