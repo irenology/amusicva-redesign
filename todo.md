@@ -49,6 +49,9 @@
   - [x] Added "World-class musicians. Dedicated teachers." tagline
   - [x] Improved musician card styling with hover effects
   - [x] Vocal teacher placeholder (Michelle - Coming Soon)
+  - [x] Integrated into Faculty section (removed standalone section)
+  - [x] Form shows when clicking on faculty member avatar
+  - [x] Bio and hire form displayed side-by-side in modal
 - [x] Add "Book Practice Room" button to home page
   - [x] Link from Spaces section to /practice-room-booking
   - [x] Direct click on Practice Rooms card to booking page

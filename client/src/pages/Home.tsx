@@ -68,6 +68,216 @@ const faculty = [
   },
 ];
 
+// ─── Hire Musicians Form Component ───────────────────────────
+
+function HireMusiciansForm({ musician }: { musician: string }) {
+  const [formData, setFormData] = useState({
+    eventType: "",
+    eventDate: "",
+    eventLocation: "",
+    guestCount: "",
+    musicianPreference: musician,
+    name: "",
+    email: "",
+    phone: "",
+    additionalDetails: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 5000);
+    setFormData({
+      eventType: "",
+      eventDate: "",
+      eventLocation: "",
+      guestCount: "",
+      musicianPreference: musician,
+      name: "",
+      email: "",
+      phone: "",
+      additionalDetails: "",
+    });
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "0.75rem",
+    border: `1px solid ${C.border}`,
+    borderRadius: "0.5rem",
+    fontFamily: "inherit",
+    fontSize: "0.9rem",
+    color: C.text,
+    background: C.white,
+  };
+
+  return (
+    <div>
+      <h4 className="font-display text-xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+        Hire {musician}
+      </h4>
+
+      {submitted && (
+        <div
+          className="p-4 rounded mb-4"
+          style={{ background: `${C.accent}20`, border: `1px solid ${C.accent}` }}
+        >
+          <p style={{ color: C.accent, fontSize: "0.9rem", fontWeight: 500 }}>
+            Thank you! We received your inquiry and will contact you soon.
+          </p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Event Type
+          </label>
+          <select
+            name="eventType"
+            value={formData.eventType}
+            onChange={handleChange}
+            required
+            style={{ ...inputStyle, cursor: "pointer" }}
+          >
+            <option value="">Select an event type</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Corporate Event">Corporate Event</option>
+            <option value="Private Concert">Private Concert</option>
+            <option value="Party">Party</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Event Date (yyyy/mm/dd)
+          </label>
+          <input
+            type="text"
+            name="eventDate"
+            placeholder="yyyy/mm/dd"
+            value={formData.eventDate}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Event Location
+          </label>
+          <input
+            type="text"
+            name="eventLocation"
+            placeholder="City, Venue"
+            value={formData.eventLocation}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Guest Count
+          </label>
+          <input
+            type="text"
+            name="guestCount"
+            placeholder="Approximate number of guests"
+            value={formData.guestCount}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Your Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Phone
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+            Additional Details
+          </label>
+          <textarea
+            name="additionalDetails"
+            value={formData.additionalDetails}
+            onChange={handleChange}
+            rows={3}
+            style={{ ...inputStyle, fontFamily: "inherit" }}
+          />
+        </div>
+
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            background: C.accent,
+            color: C.white,
+            border: "none",
+            borderRadius: "0.5rem",
+            fontSize: "0.9rem",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Send Inquiry
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ─── Scroll Reveal Hook ───────────────────────────────────────
 
 function useReveal() {
@@ -1022,15 +1232,10 @@ function Faculty() {
             className="mt-12 p-8 rounded"
             style={{ background: C.card, border: `1px solid ${C.border}` }}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-display text-2xl mb-2" style={{ color: C.text, fontWeight: 500 }}>
-                  {faculty[expanded].name}
-                </h3>
-                <p style={{ color: C.accent, fontSize: "0.9rem", fontWeight: 600, letterSpacing: "0.05em" }}>
-                  {faculty[expanded].instrument}
-                </p>
-              </div>
+            <div className="flex items-start justify-between mb-6">
+              <h3 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
+                {faculty[expanded].name}
+              </h3>
               <button
                 onClick={() => setExpanded(null)}
                 className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
@@ -1039,9 +1244,21 @@ function Faculty() {
                 <X size={20} />
               </button>
             </div>
-            <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300, lineHeight: "1.7" }}>
-              {faculty[expanded].long || faculty[expanded].short}
-            </p>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Bio Section */}
+              <div>
+                <p style={{ color: C.accent, fontSize: "0.9rem", fontWeight: 600, letterSpacing: "0.05em", marginBottom: "1rem" }}>
+                  {faculty[expanded].instrument}
+                </p>
+                <p style={{ color: C.textMid, fontSize: "0.95rem", fontWeight: 300, lineHeight: "1.7" }}>
+                  {faculty[expanded].long || faculty[expanded].short}
+                </p>
+              </div>
+
+              {/* Hire Musicians Form */}
+              <HireMusiciansForm musician={faculty[expanded].name} />
+            </div>
           </div>
         )}
       </div>
@@ -1426,312 +1643,6 @@ function Events() {
   );
 }
 
-// ─── Hire Our Musicians Section ──────────────────────────────────────────
-
-function HireOurMusicians() {
-  const [selectedMusician, setSelectedMusician] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
-    eventType: "",
-    eventDate: "",
-    eventLocation: "",
-    guestCount: "",
-    musicianPreference: "",
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-  const [submitted, setSubmitted] = useState(false);
-
-  const musicians = [
-    {
-      name: "Norman Charette",
-      instrument: "Piano",
-      bio: "Accomplished pianist available for weddings, corporate events, and private concerts.",
-    },
-    {
-      name: "Bogdan Pejić",
-      instrument: "Guitar & Composition",
-      bio: "Versatile guitarist perfect for intimate gatherings and special occasions.",
-    },
-    {
-      name: "Vesna Pejić",
-      instrument: "Violin & Viola",
-      bio: "Elegant string performances ideal for weddings and formal events.",
-    },
-    {
-      name: "Erin McAfee",
-      instrument: "Flute & Piccolo",
-      bio: "Delightful flute performances for any celebration or gathering.",
-    },
-    {
-      name: "Teymour Saifi",
-      instrument: "Electric Bass",
-      bio: "Contemporary bass player for modern events and creative performances.",
-    },
-  ];
-
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
-    setFormData({
-      eventType: "",
-      eventDate: "",
-      eventLocation: "",
-      guestCount: "",
-      musicianPreference: "",
-      name: "",
-      email: "",
-      phone: "",
-      message: "",
-    });
-  };
-
-  const inputStyle = {
-    width: "100%",
-    padding: "0.75rem",
-    border: `1px solid ${C.border}`,
-    borderRadius: "0.5rem",
-    fontFamily: "inherit",
-    fontSize: "0.95rem",
-    color: C.text,
-    background: C.white,
-    transition: "border-color 0.2s",
-  };
-
-  return (
-    <section id="hire" className="py-24" style={{ background: C.card }}>
-      <div className="container">
-        <div className="text-center mb-16">
-          <div
-            className="inline-flex items-center gap-2 mb-4 font-ui text-xs tracking-widest uppercase"
-            style={{ color: C.accent, letterSpacing: "0.2em" }}
-          >
-            <span className="w-4 h-px" style={{ background: C.accent }} />
-            Performance Bookings
-            <span className="w-4 h-px" style={{ background: C.accent }} />
-          </div>
-
-          <h2
-            className="font-display mb-6 leading-tight"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              color: C.text,
-              fontWeight: 400,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Hire Our Musicians
-            <br />
-            <span style={{ color: C.accent, fontStyle: "italic" }}>for Your Special Event.</span>
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-12">
-          {/* Musicians Grid */}
-          <div>
-            <h3
-              className="font-display text-2xl mb-8"
-              style={{ color: C.text, fontWeight: 500 }}
-            >
-              Our Featured Musicians
-            </h3>
-            <div className="space-y-4">
-              {musicians.map((musician, i) => (
-                <div
-                  key={i}
-                  onClick={() => setSelectedMusician(selectedMusician === i ? null : i)}
-                  className="p-4 rounded cursor-pointer transition-all"
-                  style={{
-                    background: selectedMusician === i ? `${C.accent}15` : C.white,
-                    border: `1px solid ${selectedMusician === i ? C.accent : C.border}`,
-                  }}
-                >
-                  <h4 className="font-display text-lg" style={{ color: C.text, fontWeight: 500 }}>
-                    {musician.name}
-                  </h4>
-                  <p style={{ color: C.accent, fontSize: "0.9rem", fontWeight: 500, marginBottom: "0.5rem" }}>
-                    {musician.instrument}
-                  </p>
-                  <p style={{ color: C.muted, fontSize: "0.9rem", fontWeight: 300 }}>
-                    {musician.bio}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Booking Form */}
-          <div>
-            <h3
-              className="font-display text-2xl mb-8"
-              style={{ color: C.text, fontWeight: 500 }}
-            >
-              Booking Inquiry
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Event Type
-                </label>
-                <select
-                  name="eventType"
-                  value={formData.eventType}
-                  onChange={handleFormChange}
-                  required
-                  style={{ ...inputStyle, cursor: "pointer" }}
-                >
-                  <option value="">Select an event type</option>
-                  <option value="wedding">Wedding</option>
-                  <option value="corporate">Corporate Event</option>
-                  <option value="private">Private Concert</option>
-                  <option value="party">Birthday Party</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Event Date
-                </label>
-                <input
-                  type="date"
-                  name="eventDate"
-                  value={formData.eventDate}
-                  onChange={handleFormChange}
-                  required
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Event Location
-                </label>
-                <input
-                  type="text"
-                  name="eventLocation"
-                  value={formData.eventLocation}
-                  onChange={handleFormChange}
-                  placeholder="City, Venue"
-                  required
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Guest Count
-                </label>
-                <input
-                  type="number"
-                  name="guestCount"
-                  value={formData.guestCount}
-                  onChange={handleFormChange}
-                  placeholder="Approximate number of guests"
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Musician Preference
-                </label>
-                <select
-                  name="musicianPreference"
-                  value={formData.musicianPreference}
-                  onChange={handleFormChange}
-                  style={{ ...inputStyle, cursor: "pointer" }}
-                >
-                  <option value="">No preference</option>
-                  {musicians.map((m, i) => (
-                    <option key={i} value={m.name}>
-                      {m.name} - {m.instrument}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleFormChange}
-                  required
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleFormChange}
-                  required
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleFormChange}
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500, display: "block", marginBottom: "0.5rem" }}>
-                  Additional Details
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleFormChange}
-                  placeholder="Tell us more about your event..."
-                  rows={4}
-                  style={{ ...inputStyle, resize: "none" }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 rounded font-ui font-semibold transition-all hover:opacity-90 cursor-pointer"
-                style={{ background: C.accent, color: C.white, border: "none", fontSize: "0.95rem", letterSpacing: "0.05em" }}
-              >
-                {submitted ? "✓ Inquiry Sent!" : "Send Booking Inquiry"}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <Divider />
-    </section>
-  );
-}
-
 // ─── Contact Section ──────────────────────────────────────────
 
 function Contact({ onBookClick }: { onBookClick: () => void }) {
@@ -2013,7 +1924,6 @@ export default function Home() {
       <Spaces />
       <PaymentInfo />
       <Events />
-      <HireOurMusicians />
       <Contact onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} />
       <Footer />
     </div>
