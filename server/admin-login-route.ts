@@ -28,11 +28,13 @@ adminLoginRoute.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    const foundUser = await db
+    const rows = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
-      .then((rows) => rows[0]);
+      .limit(1);
+
+    const foundUser = rows[0];
 
     if (!foundUser) {
       return res.status(401).json({
@@ -48,7 +50,14 @@ adminLoginRoute.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    const passwordMatch = await compare(password, foundUser.password || "");
+    if (!foundUser.password) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const passwordMatch = await compare(password, foundUser.password);
     if (!passwordMatch) {
       return res.status(401).json({
         success: false,
@@ -56,17 +65,9 @@ adminLoginRoute.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    // Ensure the user has an openId set (use email as openId for admin users).
-    // This allows the standard getUserByOpenId() lookup to work in authenticateRequest.
-    const openId = foundUser.openId || `admin_email_${foundUser.email}`;
-    if (!foundUser.openId) {
-      await db
-        .update(users)
-        .set({ openId })
-        .where(eq(users.email, email));
-    }
-
-    const sessionToken = await sdk.createSessionToken(openId, {
+    // Use the user's email as the session openId.
+    // The authenticateRequest in sdk.ts handles email-based sessions via getUserByEmail fallback.
+    const sessionToken = await sdk.createSessionToken(foundUser.email as string, {
       name: (foundUser.name || foundUser.email) as string,
     });
 
@@ -86,7 +87,7 @@ adminLoginRoute.post("/", async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Admin login error:", error);
+    console.error("[AdminLogin] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

@@ -6,7 +6,6 @@ import type { Request } from "express";
 import { SignJWT, jwtVerify } from "jose";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
-import { getUserByEmail } from "../db";
 import { ENV } from "./env";
 import type {
   ExchangeTokenRequest,
@@ -257,7 +256,6 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
     const session = await this.verifySession(sessionCookie);
@@ -269,27 +267,37 @@ class SDKServer {
     const sessionUserId = session.openId;
     const signedInAt = new Date();
 
-    // Handle admin email-based sessions (created by admin-login-route)
-    // The admin-login-route stores the user's email as the openId in the JWT.
-    // We first try to look up by openId (for regular OAuth users), then fall
-    // back to email lookup (for admin users who have no openId set).
-    if (sessionUserId.startsWith("admin:")) {
-      const email = sessionUserId.slice("admin:".length);
-      const user = await getUserByEmail(email);
-      if (!user) {
-        throw ForbiddenError("Admin user not found");
-      }
-      return user;
-    }
-
+    // First try standard openId lookup (works for OAuth users)
     let user = await db.getUserByOpenId(sessionUserId);
 
-    // Fallback: if the sessionUserId looks like an email (admin login stores email as openId),
-    // try to find the user by email directly.
+    // Fallback for admin users: the admin-login-route stores the user's email
+    // as the openId in the JWT (since admin users have no real openId).
+    // If the openId looks like an email, try getUserByEmail as a fallback.
     if (!user && sessionUserId.includes("@")) {
-      const adminUser = await getUserByEmail(sessionUserId);
+      console.log("[Auth] openId lookup failed, trying email fallback for:", sessionUserId);
+      const adminUser = await db.getUserByEmail(sessionUserId);
       if (adminUser && adminUser.role === "admin") {
-        console.log("[Auth] Resolved admin user by email fallback:", sessionUserId);
+        console.log("[Auth] Resolved admin user by email:", sessionUserId);
+        return adminUser;
+      }
+    }
+
+    // Also handle 'admin:email' prefix format (used by some versions of admin-login-route)
+    if (!user && sessionUserId.startsWith("admin:")) {
+      const email = sessionUserId.slice("admin:".length);
+      const adminUser = await db.getUserByEmail(email);
+      if (adminUser) {
+        console.log("[Auth] Resolved admin user by admin: prefix:", email);
+        return adminUser;
+      }
+    }
+
+    // Also handle 'admin_email_' prefix format
+    if (!user && sessionUserId.startsWith("admin_email_")) {
+      const email = sessionUserId.slice("admin_email_".length);
+      const adminUser = await db.getUserByEmail(email);
+      if (adminUser) {
+        console.log("[Auth] Resolved admin user by admin_email_ prefix:", email);
         return adminUser;
       }
     }
@@ -316,7 +324,7 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
-    // Only call upsertUser if the user has an openId (OAuth users)
+    // Only update lastSignedIn for users with a real openId
     if (user.openId) {
       await db.upsertUser({
         openId: user.openId,

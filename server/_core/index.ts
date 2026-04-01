@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { adminLoginRoute } from "../admin-login-route";
 import { seedAdminsRoute } from "../seed-admins-route";
+import { runStartupMigration } from "../startup-migration";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -30,6 +31,9 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  // Run startup migration to ensure admin accounts exist
+  await runStartupMigration();
+
   const app = express();
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
@@ -39,7 +43,7 @@ async function startServer() {
   registerOAuthRoutes(app);
   // Admin login endpoint
   app.use("/api/admin-login", adminLoginRoute);
-  // One-time admin seeding endpoint
+  // One-time admin seeding endpoint (protected by secret)
   app.use("/api/seed-admins", seedAdminsRoute);
   // tRPC API
   app.use(
