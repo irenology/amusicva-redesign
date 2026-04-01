@@ -1954,6 +1954,7 @@ export default function Home() {
   useReveal();
   const [showCalendly, setShowCalendly] = useState(false);
   const [preSelectedTeacher, setPreSelectedTeacher] = useState<string | undefined>();
+  const [practiceRoomModalOpen, setPracticeRoomModalOpen] = useState(false);
 
   const handleLessonClick = (teacher: string) => {
     setPreSelectedTeacher(teacher);
@@ -1962,7 +1963,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
-      <Nav onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} />
+      <Nav onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} onPracticeRoomClick={() => setPracticeRoomModalOpen(true)} />
+      <PracticeRoomBookingModal isOpen={practiceRoomModalOpen} onClose={() => setPracticeRoomModalOpen(false)} />
       <BookingModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} preSelectedTeacher={preSelectedTeacher} />
       <Hero />
       <Vision />
