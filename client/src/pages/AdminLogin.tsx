@@ -18,7 +18,8 @@ export default function AdminLogin() {
   const handleLogin = () => {
     setIsLoading(true);
     // Redirect to Manus OAuth login with admin dashboard as return path
-    window.location.href = getLoginUrl("/admin/dashboard");
+    window.location.href = getLoginUrl();
+    // After login, user will be redirected to home, then can navigate to admin dashboard
   };
 
   return (

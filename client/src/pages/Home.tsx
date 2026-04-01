@@ -1,3 +1,4 @@
+import PracticeRoomBookingModal from "@/components/PracticeRoomBookingModal";
 import { useEffect, useState } from "react";
 import { Menu, X, Music, MapPin, Clock, Mail, ChevronDown, Star } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -689,7 +690,7 @@ function BookingModal({ isOpen, onClose, preSelectedTeacher }: { isOpen: boolean
 
 // ─── Navigation ───────────────────────────────────────────────
 
-function Nav({ onBookClick }: { onBookClick: () => void }) {
+function Nav({ onBookClick, onPracticeRoomClick }: { onBookClick: () => void; onPracticeRoomClick: () => void }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -755,6 +756,13 @@ function Nav({ onBookClick }: { onBookClick: () => void }) {
             </a>
           ))}
           <button
+            onClick={() => onPracticeRoomClick()}
+            className="font-ui text-sm px-5 py-2 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
+            style={{ background: `${C.accent}80`, color: C.white, fontWeight: 600, letterSpacing: "0.05em", border: "none" }}
+          >
+            Book Practice Room
+          </button>
+          <button
             onClick={onBookClick}
             className="font-ui text-sm px-5 py-2 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
             style={{ background: C.accent, color: C.white, fontWeight: 600, letterSpacing: "0.05em", border: "none" }}
@@ -786,6 +794,16 @@ function Nav({ onBookClick }: { onBookClick: () => void }) {
               {l.label}
             </a>
           ))}
+          <button
+            onClick={() => {
+              onPracticeRoomClick();
+              setOpen(false);
+            }}
+            className="font-ui text-sm px-5 py-3 rounded text-center mt-2 w-full cursor-pointer"
+            style={{ background: `${C.accent}80`, color: C.white, fontWeight: 600, border: "none" }}
+          >
+            Book Practice Room
+          </button>
           <button
             onClick={() => {
               onBookClick();
@@ -1270,283 +1288,10 @@ function Faculty() {
 
 // ─── Practice Room Booking Modal Component ─────────────────────
 
-function PracticeRoomBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [formData, setFormData] = useState({
-    membershipTier: "non-member",
-    preferredDate: "",
-    preferredTime: "",
-    duration: "1",
-    name: "",
-    email: "",
-    phone: "",
-    notes: "",
-  });
-  const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const membershipTiers = [
-    { value: "option1", label: "Option 1 - $109/month (Weekdays before 1:30 PM)" },
-    { value: "option2", label: "Option 2 - $159/month (Weekdays before 1:30 PM + evenings after 8 PM)" },
-    { value: "option3", label: "Option 3 - $209/month (Weekdays before 1:30 PM + evenings + weekends)" },
-    { value: "non-member", label: "Non-member - $25/hour" },
-  ];
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      onClose();
-      setFormData({
-        membershipTier: "non-member",
-        preferredDate: "",
-        preferredTime: "",
-        duration: "1",
-        name: "",
-        email: "",
-        phone: "",
-        notes: "",
-      });
-    }, 2000);
-  };
-
-  const inputStyle = {
-    width: "100%",
-    padding: "0.75rem",
-    border: `1px solid ${C.border}`,
-    borderRadius: "0.5rem",
-    fontFamily: "inherit",
-    fontSize: "0.9rem",
-    color: C.text,
-    background: C.white,
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-3xl rounded-lg overflow-hidden shadow-2xl"
-        style={{ background: C.white, maxHeight: "90vh", overflowY: "auto" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div
-          className="sticky top-0 flex items-center justify-between p-6 border-b"
-          style={{ background: C.card, borderColor: C.border }}
-        >
-          <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
-            Book a Practice Room
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
-            style={{ color: C.muted, background: "none", border: "none" }}
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Gallery */}
-            <div>
-              <h3 className="font-display text-lg mb-4" style={{ color: C.text, fontWeight: 500 }}>
-                Practice Rooms
-              </h3>
-              <div className="space-y-4">
-                {[
-                  "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=932,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_005501641-YBgbgg63pnuxj3Ro.jpg",
-                  "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=512,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_010008888-Awv9vvVzM4S7ee4P.jpg",
-                  "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=563,fit=crop/A3QOXG1bN1tJNqOp/mmexport1747177511454-Aq2W7gQaarC2n1pJ.jpg",
-                ].map((img, idx) => (
-                  <div key={idx} className="rounded overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
-                    <img
-                      src={img}
-                      alt={`Practice Room ${idx + 1}`}
-                      className="w-full h-auto object-cover"
-                      style={{ maxHeight: "300px" }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Booking Form */}
-            <div>
-              <h3 className="font-display text-lg mb-4" style={{ color: C.text, fontWeight: 500 }}>
-                Booking Details
-              </h3>
-
-              {submitted && (
-                <div
-                  className="p-4 rounded mb-4"
-                  style={{ background: `${C.accent}20`, border: `1px solid ${C.accent}` }}
-                >
-                  <p style={{ color: C.accent, fontSize: "0.9rem", fontWeight: 500 }}>
-                    ✓ Booking submitted! We'll contact you soon to confirm.
-                  </p>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Membership Tier
-                  </label>
-                  <select
-                    name="membershipTier"
-                    value={formData.membershipTier}
-                    onChange={handleChange}
-                    style={{ ...inputStyle, cursor: "pointer" }}
-                  >
-                    {membershipTiers.map((tier) => (
-                      <option key={tier.value} value={tier.value}>
-                        {tier.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Preferred Date
-                  </label>
-                  <input
-                    type="date"
-                    name="preferredDate"
-                    value={formData.preferredDate}
-                    onChange={handleChange}
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Preferred Time
-                  </label>
-                  <input
-                    type="time"
-                    name="preferredTime"
-                    value={formData.preferredTime}
-                    onChange={handleChange}
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Duration (hours)
-                  </label>
-                  <select
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    style={{ ...inputStyle, cursor: "pointer" }}
-                  >
-                    <option value="1">1 hour</option>
-                    <option value="2">2 hours</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Additional Notes
-                  </label>
-                  <textarea
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleChange}
-                    rows={3}
-                    style={{ ...inputStyle, fontFamily: "inherit" }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    background: C.accent,
-                    color: C.white,
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    fontSize: "0.9rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Submit Booking Request
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Spaces Section ───────────────────────────────────────────
 
-function Spaces() {
+function Spaces({ onPracticeRoomClick }: { onPracticeRoomClick: () => void }) {
   const [expandedSpace, setExpandedSpace] = useState<number | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
@@ -2223,7 +1968,7 @@ export default function Home() {
       <Vision />
       <Lessons onLessonClick={handleLessonClick} />
       <Faculty />
-      <Spaces />
+      <Spaces onPracticeRoomClick={() => setPracticeRoomModalOpen(true)} />
       <PaymentInfo />
       <Events />
       <Contact onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} />

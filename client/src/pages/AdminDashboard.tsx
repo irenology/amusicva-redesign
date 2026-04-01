@@ -27,6 +27,18 @@ export default function AdminDashboard() {
     endTime: "",
     reason: "",
   });
+  const [filters, setFilters] = useState({
+    status: "all",
+    dateFrom: "",
+    dateTo: "",
+  });
+  const [rescheduleData, setRescheduleData] = useState({
+    bookingId: 0,
+    newDate: "",
+    newTime: "",
+    notes: "",
+  });
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
 
   // Fetch bookings data
   const lessonBookingsQuery = trpc.bookings.getAllLessonBookings.useQuery();
@@ -96,8 +108,30 @@ export default function AdminDashboard() {
     );
   }
 
-  const lessonBookings = lessonBookingsQuery.data || [];
-  const practiceBookings = practiceBookingsQuery.data || [];
+  let lessonBookings = lessonBookingsQuery.data || [];
+  
+  // Apply filters
+  if (filters.status !== "all") {
+    lessonBookings = lessonBookings.filter((b: any) => b.status === filters.status);
+  }
+  if (filters.dateFrom) {
+    lessonBookings = lessonBookings.filter((b: any) => new Date(b.createdAt) >= new Date(filters.dateFrom));
+  }
+  if (filters.dateTo) {
+    lessonBookings = lessonBookings.filter((b: any) => new Date(b.createdAt) <= new Date(filters.dateTo));
+  }
+  let practiceBookings = practiceBookingsQuery.data || [];
+  
+  // Apply filters
+  if (filters.status !== "all") {
+    practiceBookings = practiceBookings.filter((b: any) => b.status === filters.status);
+  }
+  if (filters.dateFrom) {
+    practiceBookings = practiceBookings.filter((b: any) => new Date(b.createdAt) >= new Date(filters.dateFrom));
+  }
+  if (filters.dateTo) {
+    practiceBookings = practiceBookings.filter((b: any) => new Date(b.createdAt) <= new Date(filters.dateTo));
+  }
   const blockedSlots = blockedSlotsQuery.data || [];
 
   const handleCancel = (booking: any, type: "lesson" | "practice") => {
@@ -265,6 +299,68 @@ export default function AdminDashboard() {
           </button>
         </div>
 
+        {/* Filters */}
+        <div className="mb-6 p-4 rounded-lg" style={{ background: C.card, border: `1px solid ${C.border}` }}>
+          <h3 style={{ color: C.text, fontWeight: 600, marginBottom: "1rem" }}>Filters</h3>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                Status
+              </label>
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: "0.375rem",
+                  color: C.text,
+                }}
+              >
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                From Date
+              </label>
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: "0.375rem",
+                  color: C.text,
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                To Date
+              </label>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: "0.375rem",
+                  color: C.text,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Content */}
         {activeTab === "lessons" && (
           <div>
@@ -336,6 +432,10 @@ export default function AdminDashboard() {
                         <Trash2 size={14} /> Cancel
                       </button>
                       <button
+                        onClick={() => {
+                          setRescheduleData({ bookingId: booking.id, newDate: "", newTime: "", notes: "" });
+                          setShowRescheduleModal(true);
+                        }}
                         style={{
                           ...buttonStyle,
                           background: `${C.accent}20`,
@@ -422,6 +522,10 @@ export default function AdminDashboard() {
                         <Trash2 size={14} /> Cancel
                       </button>
                       <button
+                        onClick={() => {
+                          setRescheduleData({ bookingId: booking.id, newDate: "", newTime: "", notes: "" });
+                          setShowRescheduleModal(true);
+                        }}
                         style={{
                           ...buttonStyle,
                           background: `${C.accent}20`,
@@ -638,6 +742,121 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setShowBlockModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: "0.75rem",
+                    background: C.card,
+                    color: C.text,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reschedule Modal */}
+      {showRescheduleModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowRescheduleModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg p-6"
+            style={{ background: C.white, border: `1px solid ${C.border}` }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="font-display text-2xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+              Reschedule Booking
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  New Date
+                </label>
+                <input
+                  type="date"
+                  value={rescheduleData.newDate}
+                  onChange={(e) => setRescheduleData({ ...rescheduleData, newDate: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontSize: "0.9rem",
+                    color: C.text,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  New Time
+                </label>
+                <input
+                  type="time"
+                  value={rescheduleData.newTime}
+                  onChange={(e) => setRescheduleData({ ...rescheduleData, newTime: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontSize: "0.9rem",
+                    color: C.text,
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  Notes (Optional)
+                </label>
+                <textarea
+                  value={rescheduleData.notes}
+                  onChange={(e) => setRescheduleData({ ...rescheduleData, notes: e.target.value })}
+                  placeholder="Add any notes about the reschedule..."
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontSize: "0.9rem",
+                    color: C.text,
+                    minHeight: "80px",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowRescheduleModal(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: "0.75rem",
+                    background: C.accent,
+                    color: C.white,
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Confirm Reschedule
+                </button>
+                <button
+                  onClick={() => setShowRescheduleModal(false)}
                   style={{
                     flex: 1,
                     padding: "0.75rem",

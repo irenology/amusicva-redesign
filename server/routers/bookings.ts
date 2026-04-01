@@ -19,6 +19,82 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+async function sendCancellationEmail(
+  studentEmail: string,
+  studentName: string,
+  bookingType: "lesson" | "practice",
+  details: Record<string, string>
+) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("[Email] SMTP configuration incomplete, skipping email send");
+    return;
+  }
+
+  const subject =
+    bookingType === "lesson"
+      ? "Lesson Booking Cancelled - Appassionata Music School"
+      : "Practice Room Booking Cancelled - Appassionata Music School";
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #c33; color: white; padding: 20px; text-align: center; border-radius: 5px; }
+        .content { padding: 20px; background-color: #f9f9f9; }
+        .details { background-color: white; padding: 15px; border-left: 4px solid #c33; margin: 15px 0; }
+        .footer { text-align: center; padding-top: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>${bookingType === "lesson" ? "Lesson Booking" : "Practice Room Booking"} Cancelled</h1>
+        </div>
+        <div class="content">
+          <p>Dear ${studentName},</p>
+          <p>We regret to inform you that your ${bookingType === "lesson" ? "lesson" : "practice room"} booking has been cancelled by our administration team.</p>
+          
+          <div class="details">
+            <h3>Cancellation Details</h3>
+            <p><strong>Booking Type:</strong> ${bookingType === "lesson" ? "Lesson" : "Practice Room"}</p>
+            ${details.reason ? `<p><strong>Reason:</strong> ${details.reason}</p>` : ""}
+            <p><strong>Cancellation Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
+          
+          <p>If you have any questions about this cancellation or would like to reschedule, please contact us at your earliest convenience.</p>
+          
+          <p><strong>Contact Information:</strong><br>
+          Email: <a href="mailto:appassionatava@gmail.com">appassionatava@gmail.com</a></p>
+          
+          <p>Best regards,<br>
+          <strong>Appassionata Music School of Virginia</strong><br>
+          Fairfax, Virginia</p>
+        </div>
+        <div class="footer">
+          <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER,
+      to: studentEmail,
+      subject,
+      html: htmlContent,
+    });
+    console.log(`[Email] Cancellation email sent to ${studentEmail}`);
+  } catch (error) {
+    console.error(`[Email] Failed to send cancellation email: ${error}`);
+  }
+}
+
 async function sendConfirmationEmail(
   studentEmail: string,
   studentName: string,
@@ -269,12 +345,22 @@ export const bookingsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      const bookings = await db.select().from(lessonBookings).where(eq(lessonBookings.id, input.bookingId));
+      const booking = bookings[0];
+
       await db
         .update(lessonBookings)
         .set({ status: "cancelled" })
         .where(eq(lessonBookings.id, input.bookingId));
 
-      return { success: true, message: "Lesson booking cancelled" };
+      if (booking) {
+        await sendCancellationEmail(booking.studentEmail, booking.studentName, "lesson", {
+          teacher: booking.teacherName,
+          duration: booking.duration.toString(),
+        });
+      }
+
+      return { success: true, message: "Lesson booking cancelled and student notified" };
     }),
 
   // Admin: Cancel practice room booking
@@ -288,12 +374,22 @@ export const bookingsRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      const bookings = await db.select().from(practiceRoomBookings).where(eq(practiceRoomBookings.id, input.bookingId));
+      const booking = bookings[0];
+
       await db
         .update(practiceRoomBookings)
         .set({ status: "cancelled" })
         .where(eq(practiceRoomBookings.id, input.bookingId));
 
-      return { success: true, message: "Practice room booking cancelled" };
+      if (booking) {
+        await sendCancellationEmail(booking.studentEmail, booking.studentName, "practice", {
+          roomType: booking.roomType,
+          hours: booking.hours.toString(),
+        });
+      }
+
+      return { success: true, message: "Practice room booking cancelled and student notified" };
     }),
 
   // Admin: Reschedule lesson booking

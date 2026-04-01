@@ -198,3 +198,58 @@
   - [x] getBlockedTimeSlots
 - [x] Display blocked times in admin dashboard
 - [x] Admin can view, create, and delete blocked time slots
+
+
+## Current Sprint - Admin Features & Form Unification (In Progress)
+
+### Admin Features Enhancement
+- [ ] Send cancellation notification emails to students
+  - [ ] Add email template for cancellations
+  - [ ] Integrate email sending in cancelLessonBooking/cancelPracticeRoomBooking procedures
+- [ ] Implement reschedule modal with date/time picker
+  - [ ] Create reschedule modal component
+  - [ ] Add date/time selection UI
+  - [ ] Integrate with rescheduleLessonBooking/reschedulePracticeRoomBooking procedures
+- [ ] Add booking filters to admin dashboard
+  - [ ] Filter by date range (from/to dates)
+  - [ ] Filter by status (pending, confirmed, cancelled)
+  - [ ] Filter by teacher/room type
+  - [ ] Apply multiple filters simultaneously
+
+### Practice Room Booking Form Unification
+- [ ] Extract PracticeRoomBookingModal into reusable component
+- [ ] Add "Book Practice Room" button to header/navigation
+- [ ] Add "Book Practice Room" button to footer section
+- [ ] Ensure all instances use same form structure with membership tiers
+- [ ] Test form functionality across all locations
+
+
+## Admin Features & Form Unification ✅ COMPLETED
+
+### Email Notifications ✅
+- [x] Added sendCancellationEmail function
+- [x] Integrated email sending in cancelLessonBooking procedure
+- [x] Integrated email sending in cancelPracticeRoomBooking procedure
+- [x] Email templates with professional styling
+
+### Reschedule Modal ✅
+- [x] Created reschedule modal component with date/time picker
+- [x] Added to admin dashboard with form validation
+- [x] Integrated with reschedule button handlers
+
+### Booking Filters ✅
+- [x] Added filter state (status, dateFrom, dateTo)
+- [x] Implemented filter logic for lesson bookings
+- [x] Implemented filter logic for practice room bookings
+- [x] Added filter UI with dropdown and date inputs
+- [x] Filters applied in real-time
+
+### Practice Room Form Unification ✅
+- [x] Extracted PracticeRoomBookingModal into reusable component
+- [x] Added to header navigation (Book Practice Room button)
+- [x] Added to Spaces section (Practice Rooms card)
+- [x] Unified form with membership tier selection
+- [x] Form includes all fields: date, time, duration, contact info, notes
+- [x] Displays pricing tiers (Option 1/2/3, Non-Member)
+- [x] Image gallery of practice rooms
+- [x] Form validation and error handling
