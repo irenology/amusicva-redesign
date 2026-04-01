@@ -1929,6 +1929,42 @@ function Events() {
       eventType: "activity" as const,
       instruments: ["ensemble"],
     },
+    {
+      id: "activity-photo-3",
+      type: "image" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1740451601643_402c25aa.jpg",
+      title: "Faculty & Student Celebration",
+      description: "Celebrating musical achievements together",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
+    {
+      id: "activity-photo-4",
+      type: "image" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1740451598492_78e0d5ef.jpg",
+      title: "Award Presentation",
+      description: "Recognition of outstanding musical performance",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
+    {
+      id: "activity-photo-5",
+      type: "image" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747177741438_53e32c42.jpg",
+      title: "Community Gathering",
+      description: "Music school community event and celebration",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
+    {
+      id: "activity-photo-6",
+      type: "image" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747177702951_b321d30c.jpg",
+      title: "Student Ensemble",
+      description: "Young musicians performing together",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
   ];
 
   return (
