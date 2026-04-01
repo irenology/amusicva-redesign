@@ -14,9 +14,9 @@ const C = {
 };
 
 const PRACTICE_ROOM_IMAGES = [
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-1-D3j55uxi2k8BPmw3bFSwkm.webp",
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-2-Nidvp7kDrsnypDvYJ9wdtC.webp",
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-3-YZ98qkboDRFaq67p.webp",
+  "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
 ];
 
 const MEMBERSHIP_TIERS = [
@@ -162,7 +162,11 @@ export default function PracticeRoomBookingModal({
                   <img
                     src={img}
                     alt={`Practice Room ${idx + 1}`}
-                    className="w-full h-32 object-cover"
+                    className="w-full h-48 object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Practice+Room';
+                    }}
                   />
                 </div>
               ))}
