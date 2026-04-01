@@ -1924,7 +1924,7 @@ function Events() {
       type: "video" as const,
       url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747180117810_c59b0988.mp4",
       thumbnail: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747180117810_thumb_fixed_62bed266.jpg",
-      title: "Student Showcase",
+      title: "Piano Performance",
       description: "Students showcasing their musical talents",
       eventType: "activity" as const,
       instruments: ["ensemble"],
