@@ -2,6 +2,21 @@
 
 **Subject:** Website Redesign Complete — Admin Systems Live + Next Sprint Priorities
 
+## 🔐 Admin Login Credentials
+
+Use any of the following credentials to access the admin dashboard at `/admin/login`:
+
+| Email | Password |
+|---|---|
+| admin@amusicva.com | 12345678 |
+| appassionatava@gmail.com | 12345678 |
+| Norman.Charette@gmail.com | 12345678 |
+| Norman@amusicva.com | 12345678 |
+
+**Admin Dashboard URL:** https://appamusic-lsymfpta.manus.space/admin/login
+
+---
+
 Dear Team,
 
 I'm pleased to report that the Appassionata Music School website redesign project has reached a significant milestone. The admin systems are fully operational, and we're ready to move forward with the next phase of enhancements. This email outlines what we've accomplished today and the priorities for tomorrow.
