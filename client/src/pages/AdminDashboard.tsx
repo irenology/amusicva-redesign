@@ -15,8 +15,37 @@ const C = {
   white: "#FDFCF9",
 };
 
+// Read admin session from localStorage (set by AdminLogin after successful API login)
+function getLocalAdminSession(): { id: number; email: string; role: string; name: string; loggedInAt: number } | null {
+  try {
+    const raw = localStorage.getItem("admin_session");
+    if (!raw) return null;
+    const session = JSON.parse(raw);
+    if (!session || session.role !== "admin") return null;
+    // Session expires after 24 hours
+    if (Date.now() - session.loggedInAt > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem("admin_session");
+      return null;
+    }
+    return session;
+  } catch {
+    return null;
+  }
+}
+
 export default function AdminDashboard() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { user: authUser, isAuthenticated, loading, logout } = useAuth();
+  const [localSession, setLocalSession] = useState<ReturnType<typeof getLocalAdminSession>>(null);
+
+  useEffect(() => {
+    setLocalSession(getLocalAdminSession());
+  }, []);
+
+  // Use either the tRPC-authenticated user OR the localStorage admin session
+  const user = authUser || (localSession ? { ...localSession, name: localSession.name || localSession.email } : null);
+  const isAdmin = user?.role === "admin";
+  const isLoading = loading && !localSession;
+
   const [activeTab, setActiveTab] = useState<"lessons" | "practice" | "blocked">("lessons");
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [actionType, setActionType] = useState<"cancel" | "reschedule" | null>(null);
@@ -77,7 +106,7 @@ export default function AdminDashboard() {
   });
 
   // Check authorization
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
         <div style={{ textAlign: "center", color: C.text }}>
@@ -87,7 +116,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!isAuthenticated || user?.role !== "admin") {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
         <div
@@ -100,350 +129,211 @@ export default function AdminDashboard() {
           <p style={{ color: C.muted, marginBottom: "2rem" }}>
             You do not have permission to access this page. Admin access required.
           </p>
-          <a href="/" style={{ color: C.accent, textDecoration: "none", fontWeight: 500 }}>
-            ← Back to Home
+          <a href="/admin/login" style={{ color: C.accent, textDecoration: "none", fontWeight: 500 }}>
+            ← Go to Admin Login
           </a>
         </div>
       </div>
     );
   }
 
-  let lessonBookings = lessonBookingsQuery.data || [];
-  
-  // Apply filters
-  if (filters.status !== "all") {
-    lessonBookings = lessonBookings.filter((b: any) => b.status === filters.status);
-  }
-  if (filters.dateFrom) {
-    lessonBookings = lessonBookings.filter((b: any) => new Date(b.createdAt) >= new Date(filters.dateFrom));
-  }
-  if (filters.dateTo) {
-    lessonBookings = lessonBookings.filter((b: any) => new Date(b.createdAt) <= new Date(filters.dateTo));
-  }
-  let practiceBookings = practiceBookingsQuery.data || [];
-  
-  // Apply filters
-  if (filters.status !== "all") {
-    practiceBookings = practiceBookings.filter((b: any) => b.status === filters.status);
-  }
-  if (filters.dateFrom) {
-    practiceBookings = practiceBookings.filter((b: any) => new Date(b.createdAt) >= new Date(filters.dateFrom));
-  }
-  if (filters.dateTo) {
-    practiceBookings = practiceBookings.filter((b: any) => new Date(b.createdAt) <= new Date(filters.dateTo));
-  }
+  const handleLogout = async () => {
+    localStorage.removeItem("admin_session");
+    try {
+      await logout();
+    } catch {
+      // ignore
+    }
+    window.location.href = "/";
+  };
+
+  const lessonBookings = lessonBookingsQuery.data || [];
+  const practiceBookings = practiceBookingsQuery.data || [];
   const blockedSlots = blockedSlotsQuery.data || [];
 
-  const handleCancel = (booking: any, type: "lesson" | "practice") => {
-    if (type === "lesson") {
-      cancelLessonMutation.mutate({ bookingId: booking.id });
-    } else {
-      cancelPracticeMutation.mutate({ bookingId: booking.id });
-    }
-  };
+  const filteredLessonBookings = lessonBookings.filter((b: any) => {
+    if (filters.status !== "all" && b.status !== filters.status) return false;
+    return true;
+  });
 
-  const handleBlockSlot = () => {
-    if (blockData.blockDate && blockData.startTime && blockData.endTime) {
-      blockSlotMutation.mutate({
-        blockDate: blockData.blockDate,
-        startTime: blockData.startTime,
-        endTime: blockData.endTime,
-        reason: blockData.reason,
-      });
-    }
-  };
-
-  const buttonStyle = {
-    padding: "0.5rem 0.75rem",
-    border: "none",
-    borderRadius: "0.375rem",
-    fontSize: "0.8rem",
-    fontWeight: 600,
-    cursor: "pointer",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.4rem",
-    marginRight: "0.5rem",
-  };
+  const filteredPracticeBookings = practiceBookings.filter((b: any) => {
+    if (filters.status !== "all" && b.status !== filters.status) return false;
+    return true;
+  });
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
       {/* Header */}
-      <div className="sticky top-0 z-40 py-6" style={{ background: C.white, borderBottom: `1px solid ${C.border}` }}>
-        <div className="container flex items-center justify-between">
-          <div>
-            <a href="/" className="flex items-center gap-2 mb-2 text-sm font-semibold cursor-pointer" style={{ color: C.accent }}>
-              <ChevronLeft size={16} /> Back to Home
-            </a>
-            <h1 className="font-display text-3xl" style={{ color: C.text, fontWeight: 500 }}>
-              Admin Dashboard
-            </h1>
-            <p style={{ color: C.muted, marginTop: "0.5rem" }}>
-              Manage bookings and time slots
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div style={{ textAlign: "right" }}>
-              <p style={{ color: C.text, fontSize: "0.9rem", fontWeight: 500 }}>
-                {user?.name || "Admin User"}
-              </p>
-              <p style={{ color: C.muted, fontSize: "0.8rem" }}>Admin</p>
-            </div>
-            <button
-              onClick={logout}
-              style={{
-                padding: "0.5rem 1rem",
-                background: C.accent,
-                color: C.white,
-                border: "none",
-                borderRadius: "0.375rem",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
-          </div>
+      <div
+        className="sticky top-0 z-10 px-6 py-4 flex items-center justify-between"
+        style={{ background: C.white, borderBottom: `1px solid ${C.border}` }}
+      >
+        <div className="flex items-center gap-4">
+          <a href="/" style={{ color: C.muted, display: "flex", alignItems: "center", gap: "0.25rem", textDecoration: "none", fontSize: "0.9rem" }}>
+            <ChevronLeft size={16} />
+            Back to Site
+          </a>
+          <h1 className="font-display text-xl" style={{ color: C.text, fontWeight: 500 }}>
+            Admin Dashboard
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <span style={{ color: C.muted, fontSize: "0.9rem" }}>
+            {(user as any)?.name || (user as any)?.email || "Admin User"}
+          </span>
+          <button
+            onClick={handleLogout}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              background: "transparent",
+              border: `1px solid ${C.border}`,
+              borderRadius: "0.375rem",
+              color: C.text,
+              cursor: "pointer",
+              fontSize: "0.9rem",
+            }}
+          >
+            <LogOut size={16} />
+            Logout
+          </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container py-12">
-        {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="p-6 rounded-lg" style={{ background: C.white, border: `1px solid ${C.border}` }}>
-            <p style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 500, marginBottom: "0.5rem" }}>
-              TOTAL BOOKINGS
-            </p>
-            <p className="font-display text-3xl" style={{ color: C.text, fontWeight: 600 }}>
-              {lessonBookings.length + practiceBookings.length}
-            </p>
-          </div>
-          <div className="p-6 rounded-lg" style={{ background: C.white, border: `1px solid ${C.border}` }}>
-            <p style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 500, marginBottom: "0.5rem" }}>
-              LESSON BOOKINGS
-            </p>
-            <p className="font-display text-3xl" style={{ color: C.accent, fontWeight: 600 }}>
-              {lessonBookings.length}
-            </p>
-          </div>
-          <div className="p-6 rounded-lg" style={{ background: C.white, border: `1px solid ${C.border}` }}>
-            <p style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 500, marginBottom: "0.5rem" }}>
-              PRACTICE ROOM BOOKINGS
-            </p>
-            <p className="font-display text-3xl" style={{ color: C.accent, fontWeight: 600 }}>
-              {practiceBookings.length}
-            </p>
-          </div>
-          <div className="p-6 rounded-lg" style={{ background: C.white, border: `1px solid ${C.border}` }}>
-            <p style={{ color: C.muted, fontSize: "0.85rem", fontWeight: 500, marginBottom: "0.5rem" }}>
-              BLOCKED SLOTS
-            </p>
-            <p className="font-display text-3xl" style={{ color: C.accent, fontWeight: 600 }}>
-              {blockedSlots.length}
-            </p>
-          </div>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Tabs */}
-        <div className="mb-6 flex gap-4 border-b" style={{ borderColor: C.border }}>
-          <button
-            onClick={() => setActiveTab("lessons")}
-            style={{
-              padding: "1rem 1.5rem",
-              background: "none",
-              border: "none",
-              borderBottom: activeTab === "lessons" ? `3px solid ${C.accent}` : "none",
-              color: activeTab === "lessons" ? C.accent : C.muted,
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Lesson Bookings ({lessonBookings.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("practice")}
-            style={{
-              padding: "1rem 1.5rem",
-              background: "none",
-              border: "none",
-              borderBottom: activeTab === "practice" ? `3px solid ${C.accent}` : "none",
-              color: activeTab === "practice" ? C.accent : C.muted,
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Practice Room Bookings ({practiceBookings.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("blocked")}
-            style={{
-              padding: "1rem 1.5rem",
-              background: "none",
-              border: "none",
-              borderBottom: activeTab === "blocked" ? `3px solid ${C.accent}` : "none",
-              color: activeTab === "blocked" ? C.accent : C.muted,
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Blocked Time Slots ({blockedSlots.length})
-          </button>
+        <div className="flex gap-2 mb-8">
+          {(["lessons", "practice", "blocked"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: "0.625rem 1.25rem",
+                borderRadius: "0.375rem",
+                border: `1px solid ${activeTab === tab ? C.accent : C.border}`,
+                background: activeTab === tab ? C.accent : "transparent",
+                color: activeTab === tab ? C.white : C.text,
+                cursor: "pointer",
+                fontSize: "0.9rem",
+                fontWeight: activeTab === tab ? 600 : 400,
+                textTransform: "capitalize",
+              }}
+            >
+              {tab === "lessons" ? "Lesson Bookings" : tab === "practice" ? "Practice Room Bookings" : "Blocked Time Slots"}
+            </button>
+          ))}
         </div>
 
         {/* Filters */}
-        <div className="mb-6 p-4 rounded-lg" style={{ background: C.card, border: `1px solid ${C.border}` }}>
-          <h3 style={{ color: C.text, fontWeight: 600, marginBottom: "1rem" }}>Filters</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                Status
-              </label>
-              <select
-                value={filters.status}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: `1px solid ${C.border}`,
-                  borderRadius: "0.375rem",
-                  color: C.text,
-                }}
-              >
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                From Date
-              </label>
-              <input
-                type="date"
-                value={filters.dateFrom}
-                onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: `1px solid ${C.border}`,
-                  borderRadius: "0.375rem",
-                  color: C.text,
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                To Date
-              </label>
-              <input
-                type="date"
-                value={filters.dateTo}
-                onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: `1px solid ${C.border}`,
-                  borderRadius: "0.375rem",
-                  color: C.text,
-                }}
-              />
-            </div>
+        {activeTab !== "blocked" && (
+          <div className="flex gap-4 mb-6 flex-wrap">
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              style={{
+                padding: "0.5rem 1rem",
+                border: `1px solid ${C.border}`,
+                borderRadius: "0.375rem",
+                background: C.white,
+                color: C.text,
+                fontSize: "0.9rem",
+              }}
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
           </div>
-        </div>
+        )}
 
-        {/* Content */}
+        {/* Lesson Bookings Tab */}
         {activeTab === "lessons" && (
           <div>
+            <h2 className="font-display text-xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+              Lesson Bookings ({filteredLessonBookings.length})
+            </h2>
             {lessonBookingsQuery.isLoading ? (
-              <div style={{ textAlign: "center", color: C.muted, padding: "2rem" }}>
-                Loading lesson bookings...
-              </div>
-            ) : lessonBookings.length === 0 ? (
+              <div style={{ color: C.muted }}>Loading...</div>
+            ) : filteredLessonBookings.length === 0 ? (
               <div
-                style={{
-                  padding: "2rem",
-                  textAlign: "center",
-                  background: C.white,
-                  borderRadius: "0.5rem",
-                  border: `1px solid ${C.border}`,
-                }}
+                className="p-8 rounded-lg text-center"
+                style={{ background: C.white, border: `1px solid ${C.border}`, color: C.muted }}
               >
-                <p style={{ color: C.muted }}>No lesson bookings yet</p>
+                No lesson bookings found.
               </div>
             ) : (
-              <div className="space-y-4">
-                {lessonBookings.map((booking: any) => (
+              <div className="space-y-3">
+                {filteredLessonBookings.map((booking: any) => (
                   <div
                     key={booking.id}
-                    style={{
-                      padding: "1.5rem",
-                      background: C.white,
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                    }}
+                    className="p-4 rounded-lg"
+                    style={{ background: C.white, border: `1px solid ${C.border}` }}
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-display text-lg" style={{ color: C.text, fontWeight: 500 }}>
+                        <div className="font-medium" style={{ color: C.text }}>
                           {booking.studentName}
-                        </h3>
-                        <p style={{ color: C.muted, fontSize: "0.9rem", marginTop: "0.25rem" }}>
-                          Teacher: <strong>{booking.teacherName}</strong> • {booking.duration} min
-                        </p>
+                        </div>
+                        <div style={{ color: C.muted, fontSize: "0.9rem" }}>
+                          {booking.studentEmail} · {booking.teacherName} · {booking.duration} min
+                        </div>
+                        {booking.notes && (
+                          <div style={{ color: C.textMid, fontSize: "0.85rem", marginTop: "0.25rem" }}>
+                            {booking.notes}
+                          </div>
+                        )}
                       </div>
-                      <span
-                        style={{
-                          padding: "0.35rem 0.75rem",
-                          background: booking.status === "cancelled" ? "#f5d5d5" : `${C.accent}20`,
-                          color: booking.status === "cancelled" ? "#c33" : C.accent,
-                          borderRadius: "0.25rem",
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {booking.status}
-                      </span>
-                    </div>
-                    <p style={{ color: C.muted, fontSize: "0.9rem", marginBottom: "1rem" }}>
-                      Email: <a href={`mailto:${booking.studentEmail}`} style={{ color: C.accent, textDecoration: "none" }}>
-                        {booking.studentEmail}
-                      </a>
-                    </p>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
-                        onClick={() => handleCancel(booking, "lesson")}
-                        style={{
-                          ...buttonStyle,
-                          background: "#f5d5d5",
-                          color: "#c33",
-                        }}
-                      >
-                        <Trash2 size={14} /> Cancel
-                      </button>
-                      <button
-                        onClick={() => {
-                          setRescheduleData({ bookingId: booking.id, newDate: "", newTime: "", notes: "" });
-                          setShowRescheduleModal(true);
-                        }}
-                        style={{
-                          ...buttonStyle,
-                          background: `${C.accent}20`,
-                          color: C.accent,
-                        }}
-                      >
-                        <Edit3 size={14} /> Reschedule
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <span
+                          style={{
+                            padding: "0.25rem 0.75rem",
+                            borderRadius: "9999px",
+                            fontSize: "0.8rem",
+                            fontWeight: 500,
+                            background:
+                              booking.status === "confirmed"
+                                ? "#22c55e20"
+                                : booking.status === "cancelled"
+                                ? "#ef444420"
+                                : "#f59e0b20",
+                            color:
+                              booking.status === "confirmed"
+                                ? "#16a34a"
+                                : booking.status === "cancelled"
+                                ? "#dc2626"
+                                : "#d97706",
+                          }}
+                        >
+                          {booking.status}
+                        </span>
+                        {booking.status !== "cancelled" && (
+                          <button
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setActionType("cancel");
+                            }}
+                            style={{
+                              padding: "0.25rem 0.5rem",
+                              background: "transparent",
+                              border: `1px solid #ef4444`,
+                              borderRadius: "0.25rem",
+                              color: "#ef4444",
+                              cursor: "pointer",
+                              fontSize: "0.8rem",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                            }}
+                          >
+                            <Trash2 size={12} />
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -452,88 +342,90 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Practice Room Bookings Tab */}
         {activeTab === "practice" && (
           <div>
+            <h2 className="font-display text-xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
+              Practice Room Bookings ({filteredPracticeBookings.length})
+            </h2>
             {practiceBookingsQuery.isLoading ? (
-              <div style={{ textAlign: "center", color: C.muted, padding: "2rem" }}>
-                Loading practice room bookings...
-              </div>
-            ) : practiceBookings.length === 0 ? (
+              <div style={{ color: C.muted }}>Loading...</div>
+            ) : filteredPracticeBookings.length === 0 ? (
               <div
-                style={{
-                  padding: "2rem",
-                  textAlign: "center",
-                  background: C.white,
-                  borderRadius: "0.5rem",
-                  border: `1px solid ${C.border}`,
-                }}
+                className="p-8 rounded-lg text-center"
+                style={{ background: C.white, border: `1px solid ${C.border}`, color: C.muted }}
               >
-                <p style={{ color: C.muted }}>No practice room bookings yet</p>
+                No practice room bookings found.
               </div>
             ) : (
-              <div className="space-y-4">
-                {practiceBookings.map((booking: any) => (
+              <div className="space-y-3">
+                {filteredPracticeBookings.map((booking: any) => (
                   <div
                     key={booking.id}
-                    style={{
-                      padding: "1.5rem",
-                      background: C.white,
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                    }}
+                    className="p-4 rounded-lg"
+                    style={{ background: C.white, border: `1px solid ${C.border}` }}
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-display text-lg" style={{ color: C.text, fontWeight: 500 }}>
+                        <div className="font-medium" style={{ color: C.text }}>
                           {booking.studentName}
-                        </h3>
-                        <p style={{ color: C.muted, fontSize: "0.9rem", marginTop: "0.25rem" }}>
-                          Room: <strong>{booking.roomType === "premium" ? "Premium" : "Standard"}</strong> • {booking.hours} hour{booking.hours !== 1 ? "s" : ""}
-                        </p>
+                        </div>
+                        <div style={{ color: C.muted, fontSize: "0.9rem" }}>
+                          {booking.studentEmail} · {booking.roomType} · {booking.hours}h
+                        </div>
+                        {booking.notes && (
+                          <div style={{ color: C.textMid, fontSize: "0.85rem", marginTop: "0.25rem" }}>
+                            {booking.notes}
+                          </div>
+                        )}
                       </div>
-                      <span
-                        style={{
-                          padding: "0.35rem 0.75rem",
-                          background: booking.status === "cancelled" ? "#f5d5d5" : `${C.accent}20`,
-                          color: booking.status === "cancelled" ? "#c33" : C.accent,
-                          borderRadius: "0.25rem",
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {booking.status}
-                      </span>
-                    </div>
-                    <p style={{ color: C.muted, fontSize: "0.9rem", marginBottom: "1rem" }}>
-                      Email: <a href={`mailto:${booking.studentEmail}`} style={{ color: C.accent, textDecoration: "none" }}>
-                        {booking.studentEmail}
-                      </a>
-                    </p>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
-                        onClick={() => handleCancel(booking, "practice")}
-                        style={{
-                          ...buttonStyle,
-                          background: "#f5d5d5",
-                          color: "#c33",
-                        }}
-                      >
-                        <Trash2 size={14} /> Cancel
-                      </button>
-                      <button
-                        onClick={() => {
-                          setRescheduleData({ bookingId: booking.id, newDate: "", newTime: "", notes: "" });
-                          setShowRescheduleModal(true);
-                        }}
-                        style={{
-                          ...buttonStyle,
-                          background: `${C.accent}20`,
-                          color: C.accent,
-                        }}
-                      >
-                        <Edit3 size={14} /> Reschedule
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <span
+                          style={{
+                            padding: "0.25rem 0.75rem",
+                            borderRadius: "9999px",
+                            fontSize: "0.8rem",
+                            fontWeight: 500,
+                            background:
+                              booking.status === "confirmed"
+                                ? "#22c55e20"
+                                : booking.status === "cancelled"
+                                ? "#ef444420"
+                                : "#f59e0b20",
+                            color:
+                              booking.status === "confirmed"
+                                ? "#16a34a"
+                                : booking.status === "cancelled"
+                                ? "#dc2626"
+                                : "#d97706",
+                          }}
+                        >
+                          {booking.status}
+                        </span>
+                        {booking.status !== "cancelled" && (
+                          <button
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setActionType("cancel");
+                            }}
+                            style={{
+                              padding: "0.25rem 0.5rem",
+                              background: "transparent",
+                              border: `1px solid #ef4444`,
+                              borderRadius: "0.25rem",
+                              color: "#ef4444",
+                              cursor: "pointer",
+                              fontSize: "0.8rem",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                            }}
+                          >
+                            <Trash2 size={12} />
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -542,85 +434,79 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Blocked Time Slots Tab */}
         {activeTab === "blocked" && (
           <div>
-            <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-xl" style={{ color: C.text, fontWeight: 500 }}>
+                Blocked Time Slots ({blockedSlots.length})
+              </h2>
               <button
                 onClick={() => setShowBlockModal(true)}
                 style={{
-                  padding: "0.75rem 1.5rem",
-                  background: C.accent,
-                  color: C.white,
-                  border: "none",
-                  borderRadius: "0.5rem",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "inline-flex",
+                  display: "flex",
                   alignItems: "center",
                   gap: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  background: C.accent,
+                  border: "none",
+                  borderRadius: "0.375rem",
+                  color: C.white,
+                  cursor: "pointer",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
                 }}
               >
-                <Lock size={16} /> Block New Time Slot
+                <Lock size={16} />
+                Block Time Slot
               </button>
             </div>
-
             {blockedSlotsQuery.isLoading ? (
-              <div style={{ textAlign: "center", color: C.muted, padding: "2rem" }}>
-                Loading blocked time slots...
-              </div>
+              <div style={{ color: C.muted }}>Loading...</div>
             ) : blockedSlots.length === 0 ? (
               <div
-                style={{
-                  padding: "2rem",
-                  textAlign: "center",
-                  background: C.white,
-                  borderRadius: "0.5rem",
-                  border: `1px solid ${C.border}`,
-                }}
+                className="p-8 rounded-lg text-center"
+                style={{ background: C.white, border: `1px solid ${C.border}`, color: C.muted }}
               >
-                <p style={{ color: C.muted }}>No blocked time slots</p>
+                No blocked time slots.
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {blockedSlots.map((slot: any) => (
                   <div
                     key={slot.id}
-                    style={{
-                      padding: "1.5rem",
-                      background: C.white,
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                    }}
+                    className="p-4 rounded-lg"
+                    style={{ background: C.white, border: `1px solid ${C.border}` }}
                   >
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-display text-lg" style={{ color: C.text, fontWeight: 500 }}>
-                          {slot.blockDate} • {slot.startTime} - {slot.endTime}
-                        </h3>
-                        {slot.reason && (
-                          <p style={{ color: C.muted, fontSize: "0.9rem", marginTop: "0.25rem" }}>
-                            Reason: <strong>{slot.reason}</strong>
-                          </p>
-                        )}
-                        {slot.roomType && (
-                          <p style={{ color: C.muted, fontSize: "0.9rem" }}>
-                            Room: <strong>{slot.roomType}</strong>
-                          </p>
-                        )}
+                        <div className="font-medium" style={{ color: C.text }}>
+                          {slot.blockDate} · {slot.startTime} – {slot.endTime}
+                        </div>
+                        <div style={{ color: C.muted, fontSize: "0.9rem" }}>
+                          {slot.roomType ? `Room: ${slot.roomType}` : "All rooms"}
+                          {slot.reason ? ` · ${slot.reason}` : ""}
+                        </div>
                       </div>
+                      <button
+                        onClick={() => unblockSlotMutation.mutate({ id: slot.id })}
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          background: "transparent",
+                          border: `1px solid #ef4444`,
+                          borderRadius: "0.25rem",
+                          color: "#ef4444",
+                          cursor: "pointer",
+                          fontSize: "0.8rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                        }}
+                      >
+                        <Trash2 size={12} />
+                        Unblock
+                      </button>
                     </div>
-                    <button
-                      onClick={() => unblockSlotMutation.mutate({ slotId: slot.id })}
-                      style={{
-                        ...buttonStyle,
-                        background: "#f5d5d5",
-                        color: "#c33",
-                        marginRight: 0,
-                      }}
-                    >
-                      <Trash2 size={14} /> Unblock
-                    </button>
                   </div>
                 ))}
               </div>
@@ -629,248 +515,152 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Block Time Slot Modal */}
-      {showBlockModal && (
+      {/* Cancel Confirmation Modal */}
+      {selectedBooking && actionType === "cancel" && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
-          onClick={() => setShowBlockModal(false)}
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+          onClick={() => { setSelectedBooking(null); setActionType(null); }}
         >
           <div
-            className="w-full max-w-md rounded-lg p-6"
-            style={{ background: C.white, border: `1px solid ${C.border}` }}
+            className="p-6 rounded-lg max-w-md w-full mx-4"
+            style={{ background: C.white }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="font-display text-2xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
-              Block Time Slot
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={blockData.blockDate}
-                  onChange={(e) => setBlockData({ ...blockData, blockDate: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontSize: "0.9rem",
-                    color: C.text,
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Start Time
-                  </label>
-                  <input
-                    type="time"
-                    value={blockData.startTime}
-                    onChange={(e) => setBlockData({ ...blockData, startTime: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                      fontSize: "0.9rem",
-                      color: C.text,
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    End Time
-                  </label>
-                  <input
-                    type="time"
-                    value={blockData.endTime}
-                    onChange={(e) => setBlockData({ ...blockData, endTime: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                      fontSize: "0.9rem",
-                      color: C.text,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Reason (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Maintenance, Staff Meeting"
-                  value={blockData.reason}
-                  onChange={(e) => setBlockData({ ...blockData, reason: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontSize: "0.9rem",
-                    color: C.text,
-                  }}
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={handleBlockSlot}
-                  style={{
-                    flex: 1,
-                    padding: "0.75rem",
-                    background: C.accent,
-                    color: C.white,
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Block Slot
-                </button>
-                <button
-                  onClick={() => setShowBlockModal(false)}
-                  style={{
-                    flex: 1,
-                    padding: "0.75rem",
-                    background: C.card,
-                    color: C.text,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
+            <h3 className="font-display text-lg mb-4" style={{ color: C.text, fontWeight: 500 }}>
+              Cancel Booking
+            </h3>
+            <p style={{ color: C.muted, marginBottom: "1.5rem" }}>
+              Are you sure you want to cancel the booking for <strong>{selectedBooking.studentName}</strong>?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setSelectedBooking(null); setActionType(null); }}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "transparent",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: "0.375rem",
+                  color: C.text,
+                  cursor: "pointer",
+                }}
+              >
+                Keep Booking
+              </button>
+              <button
+                onClick={() => {
+                  if (activeTab === "lessons") {
+                    cancelLessonMutation.mutate({ id: selectedBooking.id });
+                  } else {
+                    cancelPracticeMutation.mutate({ id: selectedBooking.id });
+                  }
+                }}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "#ef4444",
+                  border: "none",
+                  borderRadius: "0.375rem",
+                  color: C.white,
+                  cursor: "pointer",
+                  fontWeight: 500,
+                }}
+              >
+                Cancel Booking
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Reschedule Modal */}
-      {showRescheduleModal && (
+      {/* Block Time Slot Modal */}
+      {showBlockModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
-          onClick={() => setShowRescheduleModal(false)}
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+          onClick={() => setShowBlockModal(false)}
         >
           <div
-            className="w-full max-w-md rounded-lg p-6"
-            style={{ background: C.white, border: `1px solid ${C.border}` }}
+            className="p-6 rounded-lg max-w-md w-full mx-4"
+            style={{ background: C.white }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="font-display text-2xl mb-4" style={{ color: C.text, fontWeight: 500 }}>
-              Reschedule Booking
-            </h2>
-
+            <h3 className="font-display text-lg mb-4" style={{ color: C.text, fontWeight: 500 }}>
+              Block Time Slot
+            </h3>
             <div className="space-y-4">
               <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  New Date
-                </label>
+                <label style={{ display: "block", marginBottom: "0.25rem", color: C.text, fontSize: "0.9rem" }}>Date</label>
                 <input
                   type="date"
-                  value={rescheduleData.newDate}
-                  onChange={(e) => setRescheduleData({ ...rescheduleData, newDate: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontSize: "0.9rem",
-                    color: C.text,
-                  }}
+                  value={blockData.blockDate}
+                  onChange={(e) => setBlockData({ ...blockData, blockDate: e.target.value })}
+                  style={{ width: "100%", padding: "0.5rem", border: `1px solid ${C.border}`, borderRadius: "0.375rem", fontSize: "0.9rem" }}
                 />
               </div>
-
+              <div className="flex gap-3">
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: "block", marginBottom: "0.25rem", color: C.text, fontSize: "0.9rem" }}>Start Time</label>
+                  <input
+                    type="time"
+                    value={blockData.startTime}
+                    onChange={(e) => setBlockData({ ...blockData, startTime: e.target.value })}
+                    style={{ width: "100%", padding: "0.5rem", border: `1px solid ${C.border}`, borderRadius: "0.375rem", fontSize: "0.9rem" }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: "block", marginBottom: "0.25rem", color: C.text, fontSize: "0.9rem" }}>End Time</label>
+                  <input
+                    type="time"
+                    value={blockData.endTime}
+                    onChange={(e) => setBlockData({ ...blockData, endTime: e.target.value })}
+                    style={{ width: "100%", padding: "0.5rem", border: `1px solid ${C.border}`, borderRadius: "0.375rem", fontSize: "0.9rem" }}
+                  />
+                </div>
+              </div>
               <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  New Time
-                </label>
+                <label style={{ display: "block", marginBottom: "0.25rem", color: C.text, fontSize: "0.9rem" }}>Reason (optional)</label>
                 <input
-                  type="time"
-                  value={rescheduleData.newTime}
-                  onChange={(e) => setRescheduleData({ ...rescheduleData, newTime: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontSize: "0.9rem",
-                    color: C.text,
-                  }}
+                  type="text"
+                  value={blockData.reason}
+                  onChange={(e) => setBlockData({ ...blockData, reason: e.target.value })}
+                  placeholder="e.g. Holiday, Maintenance..."
+                  style={{ width: "100%", padding: "0.5rem", border: `1px solid ${C.border}`, borderRadius: "0.375rem", fontSize: "0.9rem" }}
                 />
               </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Notes (Optional)
-                </label>
-                <textarea
-                  value={rescheduleData.notes}
-                  onChange={(e) => setRescheduleData({ ...rescheduleData, notes: e.target.value })}
-                  placeholder="Add any notes about the reschedule..."
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontSize: "0.9rem",
-                    color: C.text,
-                    minHeight: "80px",
-                    fontFamily: "inherit",
-                  }}
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => {
-                    setShowRescheduleModal(false);
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "0.75rem",
-                    background: C.accent,
-                    color: C.white,
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Confirm Reschedule
-                </button>
-                <button
-                  onClick={() => setShowRescheduleModal(false)}
-                  style={{
-                    flex: 1,
-                    padding: "0.75rem",
-                    background: C.card,
-                    color: C.text,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
+            </div>
+            <div className="flex gap-3 justify-end mt-6">
+              <button
+                onClick={() => setShowBlockModal(false)}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "transparent",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: "0.375rem",
+                  color: C.text,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (!blockData.blockDate || !blockData.startTime || !blockData.endTime) return;
+                  blockSlotMutation.mutate({ ...blockData, createdBy: user?.id || 0 });
+                }}
+                disabled={!blockData.blockDate || !blockData.startTime || !blockData.endTime}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: C.accent,
+                  border: "none",
+                  borderRadius: "0.375rem",
+                  color: C.white,
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  opacity: !blockData.blockDate || !blockData.startTime || !blockData.endTime ? 0.6 : 1,
+                }}
+              >
+                Block Slot
+              </button>
             </div>
           </div>
         </div>

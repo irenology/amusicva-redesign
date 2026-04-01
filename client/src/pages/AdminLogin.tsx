@@ -43,7 +43,14 @@ export default function AdminLogin() {
         return;
       }
 
-      // Login successful - use hard redirect to force auth state refresh
+      // Login successful - store admin session in localStorage for dashboard access
+      localStorage.setItem("admin_session", JSON.stringify({
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        name: data.user.name || data.user.email,
+        loggedInAt: Date.now(),
+      }));
       window.location.href = "/admin/dashboard";
     } catch (err) {
       setError("An error occurred. Please try again.");
