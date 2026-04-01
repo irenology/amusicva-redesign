@@ -91,7 +91,7 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setActiveEventType(null)}
-              className="px-4 py-2 rounded text-sm font-medium transition-all duration-200"
+              className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
               style={{
                 background: !activeEventType ? C.accent : C.card,
                 color: !activeEventType ? C.white : C.text,
@@ -104,7 +104,7 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
               <button
                 key={eventType}
                 onClick={() => setActiveEventType(eventType)}
-                className="px-4 py-2 rounded text-sm font-medium transition-all duration-200"
+                className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
                 style={{
                   background: activeEventType === eventType ? C.accent : C.card,
                   color: activeEventType === eventType ? C.white : C.text,
@@ -125,7 +125,7 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setActiveInstrument(null)}
-              className="px-4 py-2 rounded text-sm font-medium transition-all duration-200"
+              className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
               style={{
                 background: !activeInstrument ? C.accent : C.card,
                 color: !activeInstrument ? C.white : C.text,
@@ -138,7 +138,7 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
               <button
                 key={instrument}
                 onClick={() => setActiveInstrument(instrument)}
-                className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 capitalize"
+                className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md capitalize"
                 style={{
                   background: activeInstrument === instrument ? C.accent : C.card,
                   color: activeInstrument === instrument ? C.white : C.text,
@@ -164,7 +164,7 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
             <div
               key={item.id}
               onClick={() => openLightbox(item)}
-              className="reveal group relative overflow-hidden rounded cursor-pointer transition-transform duration-300 hover:scale-105"
+              className="reveal group relative overflow-hidden rounded cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105"
               style={{
                 background: C.card,
                 border: `1px solid ${C.border}`,
@@ -174,47 +174,64 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
               {/* Thumbnail/Preview */}
               <img
                 src={
-                  item.type === "video"
-                    ? item.thumbnail || `https://img.youtube.com/vi/${extractVideoId(item.url)}/0.jpg`
-                    : item.url
+                  item.type === "video" && item.thumbnail
+                    ? item.thumbnail
+                    : item.type === "image"
+                    ? item.url
+                    : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect fill='%23e5e5e5' width='16' height='9'/%3E%3C/svg%3E"
                 }
                 alt={item.title}
-                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-80"
+                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75"
                 loading="lazy"
               />
 
-              {/* Overlay */}
-              <div
-                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: "rgba(0,0,0,0.4)" }}
-              >
-                {item.type === "video" ? (
-                  <Play size={48} color="white" fill="white" />
-                ) : (
-                  <div style={{ color: "white", fontSize: "0.9rem", fontWeight: 600 }}>
-                    View
+              {/* Overlay - Video Play Button */}
+              {item.type === "video" && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: "rgba(0,0,0,0.3)" }}
+                >
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                    style={{ background: `${C.accent}dd` }}
+                  >
+                    <Play size={32} color={C.white} fill={C.white} />
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* Title Badge */}
+              {/* Title & Info Badge */}
               <div
-                className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent"
-                style={{ color: "white" }}
+                className="absolute bottom-0 left-0 right-0 p-4 transition-all duration-300"
+                style={{
+                  background: `linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.3), transparent)`,
+                }}
               >
-                <p className="text-sm font-semibold truncate">{item.title}</p>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <p className="text-sm font-semibold truncate" style={{ color: C.white }}>
+                  {item.title}
+                </p>
+                <div className="flex flex-wrap gap-1 mt-2">
                   {item.instruments.map((instrument) => (
                     <span
                       key={instrument}
-                      className="text-xs px-2 py-0.5 rounded-full capitalize"
-                      style={{ background: "rgba(255,255,255,0.3)", color: "white" }}
+                      className="text-xs px-2 py-0.5 rounded-full capitalize font-medium"
+                      style={{ background: `${C.accent}cc`, color: C.white }}
                     >
                       {instrument}
                     </span>
                   ))}
                 </div>
               </div>
+
+              {/* Video Badge */}
+              {item.type === "video" && (
+                <div
+                  className="absolute top-3 right-3 px-2 py-1 rounded text-xs font-semibold"
+                  style={{ background: `${C.accent}dd`, color: C.white }}
+                >
+                  VIDEO
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -232,23 +249,22 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
       {/* Lightbox Modal */}
       {isOpen && selectedItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn"
           style={{
-            background: "rgba(0,0,0,0.9)",
-            backdropFilter: "blur(4px)",
-            animation: "fadeIn 0.3s ease-out",
+            background: "rgba(0,0,0,0.95)",
+            backdropFilter: "blur(8px)",
           }}
           onClick={closeLightbox}
         >
           <div
-            className="relative w-full max-w-4xl max-h-[90vh] rounded-lg overflow-hidden"
+            className="relative w-full max-w-5xl max-h-[90vh] rounded-lg overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={closeLightbox}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full transition-colors duration-200 hover:bg-white/20"
-              style={{ background: "rgba(0,0,0,0.5)", color: "white" }}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full transition-all duration-200 hover:bg-white/30 hover:scale-110"
+              style={{ background: "rgba(0,0,0,0.6)", color: "white" }}
             >
               <X size={24} />
             </button>
@@ -274,23 +290,23 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
               </div>
             )}
 
-            {/* Info */}
+            {/* Info Section */}
             {(selectedItem.title || selectedItem.description) && (
               <div
-                className="p-4"
+                className="p-6"
                 style={{ background: C.card, borderTop: `1px solid ${C.border}` }}
               >
-                <h3 className="font-display text-lg mb-2" style={{ color: C.text, fontWeight: 500 }}>
+                <h3 className="font-display text-xl mb-2" style={{ color: C.text, fontWeight: 600 }}>
                   {selectedItem.title}
                 </h3>
                 {selectedItem.description && (
-                  <p style={{ color: C.muted, fontSize: "0.9rem", lineHeight: "1.6", marginBottom: "0.5rem" }}>
+                  <p style={{ color: C.textMid, fontSize: "0.95rem", lineHeight: "1.6", marginBottom: "1rem" }}>
                     {selectedItem.description}
                   </p>
                 )}
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div className="flex flex-wrap gap-2 mt-4">
                   <span
-                    className="text-xs px-3 py-1 rounded-full"
+                    className="text-xs px-3 py-1.5 rounded-full font-semibold"
                     style={{ background: `${C.accent}20`, color: C.accent }}
                   >
                     {EVENT_TYPE_LABELS[selectedItem.eventType]}
@@ -298,7 +314,7 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
                   {selectedItem.instruments.map((instrument) => (
                     <span
                       key={instrument}
-                      className="text-xs px-3 py-1 rounded-full capitalize"
+                      className="text-xs px-3 py-1.5 rounded-full capitalize font-medium"
                       style={{ background: `${C.accent}10`, color: C.text }}
                     >
                       {instrument}
@@ -320,14 +336,10 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
             opacity: 1;
           }
         }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
       `}</style>
     </>
   );
-}
-
-// Helper function to extract video ID from URL
-function extractVideoId(url: string): string {
-  const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-  if (youtubeMatch) return youtubeMatch[1];
-  return "";
 }
