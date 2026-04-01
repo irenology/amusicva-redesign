@@ -1913,7 +1913,7 @@ function Events() {
       id: "activity-video-1",
       type: "video" as const,
       url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/IMG_7276_a3df1992.MOV",
-      thumbnail: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/IMG_7276_thumb_997f2d12.jpg",
+      thumbnail: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/IMG_7276_thumb_fixed_24a71691.jpg",
       title: "Studio Activity",
       description: "Behind the scenes at Appassionata Music School",
       eventType: "activity" as const,
@@ -1923,7 +1923,7 @@ function Events() {
       id: "activity-video-2",
       type: "video" as const,
       url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747180117810_c59b0988.mp4",
-      thumbnail: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747180117810_thumb_f345c507.jpg",
+      thumbnail: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747180117810_thumb_fixed_62bed266.jpg",
       title: "Student Showcase",
       description: "Students showcasing their musical talents",
       eventType: "activity" as const,
@@ -1962,8 +1962,14 @@ function Events() {
         {/* Upcoming Events */}
         <div className="mb-16">
           <h3
-            className="font-display text-2xl mb-8 text-center"
-            style={{ color: C.text, fontWeight: 500 }}
+            className="font-display mb-8 text-center"
+            style={{
+              fontSize: "clamp(2rem, 4vw, 2.8rem)",
+              color: C.accent,
+              fontWeight: 600,
+              letterSpacing: "-0.01em",
+              textShadow: `0 2px 4px rgba(0,0,0,0.05)`,
+            }}
           >
             Upcoming Events
           </h3>
@@ -2005,8 +2011,14 @@ function Events() {
         {/* Past Events */}
         <div>
           <h3
-            className="font-display text-2xl mb-8 text-center"
-            style={{ color: C.text, fontWeight: 500 }}
+            className="font-display mb-8 text-center"
+            style={{
+              fontSize: "clamp(2rem, 4vw, 2.8rem)",
+              color: C.accent,
+              fontWeight: 600,
+              letterSpacing: "-0.01em",
+              textShadow: `0 2px 4px rgba(0,0,0,0.05)`,
+            }}
           >
             Past Events
           </h3>
@@ -2039,8 +2051,14 @@ function Events() {
         {galleryItems.length > 0 && (
           <div className="mt-16">
             <h3
-              className="font-display text-2xl mb-8 text-center"
-              style={{ color: C.text, fontWeight: 500 }}
+              className="font-display mb-8 text-center"
+              style={{
+                fontSize: "clamp(2rem, 4vw, 2.8rem)",
+                color: C.accent,
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+                textShadow: `0 2px 4px rgba(0,0,0,0.05)`,
+              }}
             >
               Gallery
             </h3>
