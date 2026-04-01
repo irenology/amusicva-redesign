@@ -17,6 +17,16 @@
 
 ## In Progress / Pending
 
+### Gallery Feature ✅ COMPLETED
+- [x] Add Gallery section below Past Events in Events section
+  - [x] Create CategorizedEventGallery component with image/video grid
+  - [x] Support for images and videos
+  - [x] Lightbox/modal for full-size viewing
+  - [x] Filter by event type (Performance, Activity)
+  - [x] Filter by instrument (Flute, Violin, Piano, Ensemble)
+  - [x] All 7 media files uploaded to CDN
+  - [x] Gallery items properly categorized and tagged
+
 ### P0 Priority (Blocking)
 - [x] Practice room self-booking system with private link
   - [x] 3-day advance booking window

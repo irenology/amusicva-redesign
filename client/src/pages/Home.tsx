@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Menu, X, Music, MapPin, Clock, Mail, ChevronDown, Star, Check } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { CategorizedEventGallery } from "@/components/CategorizedEventGallery";
 
 // ─── Color Tokens ─────────────────────────────────────────────
 
@@ -1855,6 +1856,75 @@ function Events() {
       description: "Meet our faculty, tour our studios, and experience the Appassionata community.",
     },
   ];
+  
+  // Gallery items with categorization by event type and instruments
+  const galleryItems = [
+    // Performances
+    {
+      id: "firefly-flute",
+      type: "video" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/Firefly-Flute-3secondclip_0f0f405f.mp4",
+      title: "Firefly - Flute Performance",
+      description: "A beautiful flute performance of Firefly",
+      eventType: "performance" as const,
+      instruments: ["flute"],
+    },
+    {
+      id: "firefly-violin",
+      type: "video" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/Firefly-Violin-3secondclip_205a9b8b.mp4",
+      title: "Firefly - Violin Performance",
+      description: "A beautiful violin performance of Firefly",
+      eventType: "performance" as const,
+      instruments: ["violin"],
+    },
+    {
+      id: "piano-insides",
+      type: "video" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/PianoInsides-3secondclip_d166d15a.mp4",
+      title: "Piano Performance",
+      description: "Inside view of a piano performance",
+      eventType: "performance" as const,
+      instruments: ["piano"],
+    },
+    // Activities
+    {
+      id: "activity-photo-1",
+      type: "image" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/DSCF2764_36dda1a5.webp",
+      title: "Community Event",
+      description: "Students and faculty enjoying a community music event",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
+    {
+      id: "activity-photo-2",
+      type: "image" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/DSCF2762_7f56de0e.webp",
+      title: "Piano Studio Session",
+      description: "A special piano studio session with faculty and students",
+      eventType: "activity" as const,
+      instruments: ["piano"],
+    },
+    {
+      id: "activity-video-1",
+      type: "video" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/IMG_7276_a3df1992.MOV",
+      title: "Studio Activity",
+      description: "Behind the scenes at Appassionata Music School",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
+    {
+      id: "activity-video-2",
+      type: "video" as const,
+      url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/mmexport1747180117810_c59b0988.mp4",
+      title: "Student Showcase",
+      description: "Students showcasing their musical talents",
+      eventType: "activity" as const,
+      instruments: ["ensemble"],
+    },
+  ];
 
   return (
     <section id="events" className="py-24" style={{ background: C.bg }}>
@@ -1959,6 +2029,19 @@ function Events() {
             ))}
           </div>
         </div>
+
+        {/* Gallery Section */}
+        {galleryItems.length > 0 && (
+          <div className="mt-16">
+            <h3
+              className="font-display text-2xl mb-8 text-center"
+              style={{ color: C.text, fontWeight: 500 }}
+            >
+              Gallery
+            </h3>
+            <CategorizedEventGallery items={galleryItems} colors={C} />
+          </div>
+        )}
       </div>
 
       <Divider />
