@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { adminLoginRoute } from "../admin-login-route";
+import { seedAdminsRoute } from "../seed-admins-route";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -38,6 +39,8 @@ async function startServer() {
   registerOAuthRoutes(app);
   // Admin login endpoint
   app.use("/api/admin-login", adminLoginRoute);
+  // One-time admin seeding endpoint
+  app.use("/api/seed-admins", seedAdminsRoute);
   // tRPC API
   app.use(
     "/api/trpc",

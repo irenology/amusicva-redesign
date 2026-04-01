@@ -270,6 +270,9 @@ class SDKServer {
     const signedInAt = new Date();
 
     // Handle admin email-based sessions (created by admin-login-route)
+    // The admin-login-route stores the user's email as the openId in the JWT.
+    // We first try to look up by openId (for regular OAuth users), then fall
+    // back to email lookup (for admin users who have no openId set).
     if (sessionUserId.startsWith("admin:")) {
       const email = sessionUserId.slice("admin:".length);
       const user = await getUserByEmail(email);
@@ -280,6 +283,16 @@ class SDKServer {
     }
 
     let user = await db.getUserByOpenId(sessionUserId);
+
+    // Fallback: if the sessionUserId looks like an email (admin login stores email as openId),
+    // try to find the user by email directly.
+    if (!user && sessionUserId.includes("@")) {
+      const adminUser = await getUserByEmail(sessionUserId);
+      if (adminUser && adminUser.role === "admin") {
+        console.log("[Auth] Resolved admin user by email fallback:", sessionUserId);
+        return adminUser;
+      }
+    }
 
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
@@ -303,10 +316,13 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
-    });
+    // Only call upsertUser if the user has an openId (OAuth users)
+    if (user.openId) {
+      await db.upsertUser({
+        openId: user.openId,
+        lastSignedIn: signedInAt,
+      });
+    }
 
     return user;
   }
