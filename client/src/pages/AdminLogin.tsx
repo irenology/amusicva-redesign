@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { trpc } from "@/lib/trpc";
 
 const C = {
   bg: "#FAF7F2",
@@ -10,6 +9,7 @@ const C = {
   textMid: "#5C3D20",
   muted: "#8B7355",
   accent: "#B8860B",
+  accentHover: "#9A7009",
   white: "#FDFCF9",
 };
 
@@ -20,25 +20,34 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
 
-  const adminLoginMutation = trpc.system.adminLogin.useMutation({
-    onSuccess: () => {
-      setLocation("/admin/dashboard");
-    },
-    onError: (err: any) => {
-      setError(err.message || "Invalid email or password");
-      setIsLoading(false);
-    },
-  });
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      await adminLoginMutation.mutateAsync({ email, password });
+      const response = await fetch("/api/admin-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // Login successful, redirect to dashboard
+      setLocation("/admin/dashboard");
     } catch (err) {
-      console.error("[AdminLogin] Error:", err);
+      setError("An error occurred. Please try again.");
+      setIsLoading(false);
     }
   };
 
@@ -165,8 +174,16 @@ export default function AdminLogin() {
               fontWeight: 600,
               cursor: isLoading || !email || !password ? "not-allowed" : "pointer",
               opacity: isLoading || !email || !password ? 0.7 : 1,
-              transition: "opacity 0.2s",
+              transition: "opacity 0.2s, background 0.2s",
               letterSpacing: "0.05em",
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading && email && password) {
+                e.currentTarget.style.background = C.accentHover;
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = C.accent;
             }}
           >
             {isLoading ? "Signing In..." : "Sign In"}
@@ -182,6 +199,7 @@ export default function AdminLogin() {
               textDecoration: "none",
               fontSize: "0.9rem",
               fontWeight: 500,
+              cursor: "pointer",
             }}
           >
             ← Back to Home
