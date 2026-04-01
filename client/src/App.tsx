@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import ColorOptions from "./pages/ColorOptions";
 import PracticeRoomBooking from "./pages/PracticeRoomBooking";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 import MembershipPricing from "./pages/MembershipPricing";
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -17,6 +18,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/practice-room-booking"} component={PracticeRoomBooking} />
       <Route path={"/membership"} component={MembershipPricing} />
+      <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin/dashboard"} component={AdminDashboard} />
       <Route path={"/color-options"} component={ColorOptions} />
       <Route path={"/404"} component={NotFound} />

@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { publicProcedure, router } from "../_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { lessonBookings, practiceRoomBookings } from "../../drizzle/schema";
 import { notifyOwner } from "../_core/notification";
@@ -229,4 +230,30 @@ export const bookingsRouter = router({
 
       return { success: true, bookingId: booking[0] };
     }),
+
+  // Admin: Get all lesson bookings
+  getAllLessonBookings: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user?.role !== "admin") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+    }
+
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const bookings = await db.select().from(lessonBookings);
+    return bookings;
+  }),
+
+  // Admin: Get all practice room bookings
+  getAllPracticeRoomBookings: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user?.role !== "admin") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+    }
+
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const bookings = await db.select().from(practiceRoomBookings);
+    return bookings;
+  }),
 });

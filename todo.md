@@ -39,7 +39,7 @@
 - [ ] Add vocal teacher profile to Faculty section
   - [ ] Awaiting content from Michelle
 
-### P2 Priority (2-3 Weeks)
+### P2 Priority (2-3 Weeks) - COMPLETED ✅
 - [x] Events section
   - [x] Upcoming events (East Meets West Spring Concert 2025)
   - [x] Past events gallery with descriptions
@@ -87,3 +87,66 @@
 - Practice room booking system uses private URL (no login required)
 - Membership system: Requires payment integration (Stripe) for Phase 2
 - Piano Practice Room Membership: 3 tiers with time-based access control
+
+
+## Current Sprint (In Progress)
+
+### Practice Room Booking Modal (Spaces Section)
+- [ ] Add "Book a Practice Room" button to Practice Rooms card in Spaces section
+- [ ] Create modal showing practice room gallery + booking form
+- [ ] Booking form fields:
+  - [ ] Membership tier selection (Option 1/2/3 or Non-member)
+  - [ ] Preferred date and time
+  - [ ] Duration (1-2 hours)
+  - [ ] Name, email, phone
+  - [ ] Additional notes
+- [ ] Display pricing based on membership tier selection
+- [ ] Show payment methods (Zelle, Venmo, Cash)
+- [ ] Send confirmation email with booking details
+
+### Admin Dashboard & Authentication
+- [ ] Create admin login page
+- [ ] Implement admin authentication (check user role = 'admin')
+- [ ] Create /admin/dashboard route with admin-only access control
+- [ ] Admin dashboard features:
+  - [ ] View all practice room bookings
+  - [ ] View all lesson bookings
+  - [ ] View all musician hire inquiries
+  - [ ] Cancel/reschedule bookings
+  - [ ] Manage room availability
+- [ ] Add logout functionality
+- [ ] Redirect non-admin users to home page
+
+
+## Latest Sprint - COMPLETED ✅ (March 31, 2026)
+
+### Practice Room Booking Modal (Spaces Section)
+- [x] Add "Book a Practice Room" button to Practice Rooms card in Spaces section
+- [x] Create modal showing practice room gallery + booking form
+- [x] Booking form with all required fields:
+  - [x] Membership tier selection (Option 1/2/3 or Non-member)
+  - [x] Preferred date and time
+  - [x] Duration (1-2 hours)
+  - [x] Name, email, phone
+  - [x] Additional notes
+- [x] Display pricing based on membership tier
+- [x] Show payment methods (Zelle, Venmo, Cash)
+- [x] Form validation and error handling
+
+### Admin Dashboard & Authentication
+- [x] Create admin login page (/admin/login)
+- [x] Implement admin authentication (check user role = 'admin')
+- [x] Create /admin/dashboard route with admin-only access control
+- [x] Admin dashboard features:
+  - [x] View all practice room bookings
+  - [x] View all lesson bookings
+  - [x] Display booking statistics (total, lesson, practice room counts)
+  - [x] Tab-based navigation between booking types
+  - [x] Booking details display (student name, email, duration, etc.)
+  - [x] User profile display in header
+- [x] Add logout functionality with LogOut icon
+- [x] Redirect non-admin users to home page
+- [x] Backend procedures for admin access:
+  - [x] getAllLessonBookings (admin only)
+  - [x] getAllPracticeRoomBookings (admin only)
+- [x] All 23 tests passing
