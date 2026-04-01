@@ -253,3 +253,17 @@
 - [x] Displays pricing tiers (Option 1/2/3, Non-Member)
 - [x] Image gallery of practice rooms
 - [x] Form validation and error handling
+
+
+## Current Sprint - Home Page Consolidation
+
+### Integration Tasks
+- [ ] Add Membership Plans section to Home page (from MembershipPricing.tsx)
+- [ ] Add Membership Login button to Home page header
+- [ ] Add Admin Login button to Home page header
+- [ ] Integrate full practice room booking form into Home page (from PracticeRoomBooking.tsx)
+- [ ] Create role-based secondary forms:
+  - [ ] Member dashboard after login
+  - [ ] Admin dashboard (already exists, link from Home)
+- [ ] Add user profile/account section for logged-in members
+- [ ] Test all login flows and role-based access
