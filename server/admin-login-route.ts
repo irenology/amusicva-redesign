@@ -58,8 +58,11 @@ adminLoginRoute.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    const sessionIdentifier = (foundUser.openId || foundUser.email || "") as string;
-    const sessionToken = await sdk.createSessionToken(sessionIdentifier);
+    // Use a special "admin:email" prefix so the session resolver knows to look up by email
+    const sessionIdentifier = `admin:${foundUser.email}`;
+    const sessionToken = await sdk.createSessionToken(sessionIdentifier, {
+      name: (foundUser.name || foundUser.email) as string,
+    });
 
     const cookieOptions = getSessionCookieOptions(req);
     res.cookie(COOKIE_NAME, sessionToken, {

@@ -6,6 +6,7 @@ import type { Request } from "express";
 import { SignJWT, jwtVerify } from "jose";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
+import { getUserByEmail } from "../db";
 import { ENV } from "./env";
 import type {
   ExchangeTokenRequest,
@@ -214,8 +215,7 @@ class SDKServer {
 
       if (
         !isNonEmptyString(openId) ||
-        !isNonEmptyString(appId) ||
-        !isNonEmptyString(name)
+        !isNonEmptyString(appId)
       ) {
         console.warn("[Auth] Session payload missing required fields");
         return null;
@@ -224,7 +224,7 @@ class SDKServer {
       return {
         openId,
         appId,
-        name,
+        name: typeof name === "string" ? name : "",
       };
     } catch (error) {
       console.warn("[Auth] Session verification failed", String(error));
@@ -268,6 +268,17 @@ class SDKServer {
 
     const sessionUserId = session.openId;
     const signedInAt = new Date();
+
+    // Handle admin email-based sessions (created by admin-login-route)
+    if (sessionUserId.startsWith("admin:")) {
+      const email = sessionUserId.slice("admin:".length);
+      const user = await getUserByEmail(email);
+      if (!user) {
+        throw ForbiddenError("Admin user not found");
+      }
+      return user;
+    }
+
     let user = await db.getUserByOpenId(sessionUserId);
 
     // If user not in DB, sync from OAuth server automatically
