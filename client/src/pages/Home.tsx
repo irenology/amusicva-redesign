@@ -1152,6 +1152,17 @@ function Nav({ onBookClick, onPracticeRoomClick }: { onBookClick: () => void; on
               />
             </a>
           ))}
+          <a
+            href="#piano-practice-room"
+            className="font-ui text-sm tracking-wide transition-colors duration-200 relative group"
+            style={{ color: C.textMid, fontWeight: 400, letterSpacing: "0.04em", textDecoration: "none" }}
+          >
+            Piano Practice Room Rental
+            <span
+              className="absolute -bottom-0.5 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"
+              style={{ background: C.accent }}
+            />
+          </a>
           <button
             onClick={onBookClick}
             className="font-ui text-sm px-8 py-2.5 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
@@ -1762,31 +1773,53 @@ function Spaces({ onPracticeRoomClick }: { onPracticeRoomClick: () => void }) {
                   ))}
                 </ul>
 
-                <div className="flex gap-3">
+                <div className="flex items-center justify-between">
                   <p style={{ color: C.accent, fontSize: "0.85rem", fontWeight: 500 }}>
                     → Click to view {space.images.length} photo{space.images.length !== 1 ? "s" : ""}
                   </p>
-                  {space.title === "Practice Rooms" && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowBookingModal(true);
-                      }}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        background: C.accent,
-                        color: C.white,
-                        border: "none",
-                        borderRadius: "0.375rem",
-                        fontSize: "0.85rem",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Book Now
-                    </button>
-                  )}
+                  <div className="flex gap-3">
+                    {space.title === "Practice Rooms" && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowBookingModal(true);
+                        }}
+                        style={{
+                          padding: "0.5rem 1rem",
+                          background: C.accent,
+                          color: C.white,
+                          border: "none",
+                          borderRadius: "0.375rem",
+                          fontSize: "0.85rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Book Now
+                      </button>
+                    )}
+                    {space.title === "Performance Space" && (
+                      <a
+                        href="#piano-practice-room"
+                        style={{
+                          padding: "0.5rem 1rem",
+                          background: C.accent,
+                          color: C.white,
+                          border: "none",
+                          borderRadius: "0.375rem",
+                          fontSize: "0.85rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                          textDecoration: "none",
+                          display: "inline-block",
+                        }}
+                      >
+                        Membership Plans
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
 
