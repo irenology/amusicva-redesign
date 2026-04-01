@@ -1835,7 +1835,7 @@ function PaymentInfo() {
 function Events() {
   const upcomingEvents = [
     {
-      title: "2026",
+      title: "East Meets West Spring Concert 2026",
       date: "TBD",
       time: "TBD",
       venue: "Fairfax, Virginia",
