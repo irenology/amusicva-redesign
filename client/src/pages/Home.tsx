@@ -446,7 +446,7 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           style={{ background: C.card, borderColor: C.border }}
         >
           <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
-            {loginStep === "options" ? "Welcome" : "Become a Member"}
+            {loginStep === "options" ? "Welcome" : "Member Login"}
           </h2>
           <button
             onClick={onClose}
@@ -494,10 +494,10 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                 }}
               >
                 <h3 className="font-display text-xl mb-2" style={{ color: C.white, fontWeight: 500 }}>
-                  Become a Member
+                  Member Login
                 </h3>
                 <p style={{ color: `${C.white}dd`, fontSize: "0.9rem" }}>
-                  Book a practice room with our membership plans
+                  Access your member account and book practice rooms
                 </p>
               </button>
             </div>
