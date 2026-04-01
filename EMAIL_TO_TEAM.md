@@ -169,11 +169,27 @@ Best regards,
 
 ---
 
+## Admin Login Credentials
+
+All four admin accounts are active and verified. Use any of the following credentials to access the admin dashboard at `/admin/login`:
+
+| Email | Password | Name | Status |
+|---|---|---|---|
+| admin@amusicva.com | 12345678 | Admin 2 | ✅ Active |
+| appassionatava@gmail.com | 12345678 | Admin 1 | ✅ Active |
+| Norman.Charette@gmail.com | 12345678 | Norman Charette | ✅ Active |
+| Norman@amusicva.com | 12345678 | Norman | ✅ Active |
+
+**Admin Dashboard URL:** `/admin/dashboard`  
+**Admin Login URL:** `/admin/login`
+
+---
+
 ## Quick Reference
 
 **Live Website:** https://appamusic-lsymfpta.manus.space  
 **Admin Dashboard:** `/admin/dashboard` (requires admin login)  
-**Admin Accounts:** 4 verified accounts available  
+**Admin Accounts:** 4 verified accounts available (see credentials above)  
 **Design:** Cream/gold aesthetic fully implemented  
 **Booking Systems:** Lessons and Practice Rooms operational  
 
