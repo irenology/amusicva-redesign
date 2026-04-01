@@ -383,14 +383,8 @@ function Divider() {
 function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [loginStep, setLoginStep] = useState<"options" | "member">("options");
   const [memberData, setMemberData] = useState({
-    membershipTier: "",
-    bookingDate: "",
-    startTime: "",
-    duration: "",
-    name: "",
     email: "",
-    phone: "",
-    notes: "",
+    password: "",
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -405,26 +399,16 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     };
   }, [isOpen]);
 
-  const submitPracticeRoom = trpc.bookings.submitPracticeRoomBooking.useMutation();
-
   const handleMemberSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await submitPracticeRoom.mutateAsync({
-        studentName: memberData.name,
-        studentEmail: memberData.email,
-        roomType: memberData.membershipTier.includes("Premium") ? "premium" : "standard",
-        hours: parseInt(memberData.duration) || 1,
-      });
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setLoginStep("options");
-        onClose();
-      }, 3000);
-    } catch (error) {
-      console.error("Booking failed:", error);
-    }
+    // Member login will be implemented in the next phase
+    console.log("Member login:", memberData);
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setLoginStep("options");
+      onClose();
+    }, 3000);
   };
 
   if (!isOpen) return null;
@@ -508,143 +492,18 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                   className="mb-5 p-4 rounded font-ui text-sm"
                   style={{ background: `${C.accent}15`, border: `1px solid ${C.accent}40`, color: C.accent }}
                 >
-                  Thank you! Your booking has been submitted. We'll contact you soon.
+                  Login successful! Welcome back.
                 </div>
               )}
 
               <div>
                 <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Membership Tier
-                </label>
-                <select
-                  value={memberData.membershipTier}
-                  onChange={(e) => setMemberData({ ...memberData, membershipTier: e.target.value })}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontFamily: "inherit",
-                    cursor: "pointer",
-                  }}
-                >
-                  <option value="">Select a membership tier</option>
-                  <option value="Weekday Afternoon">Weekday Afternoon ($109/month)</option>
-                  <option value="Extended Access">Extended Access ($159/month)</option>
-                  <option value="Unlimited">Unlimited ($209/month)</option>
-                </select>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Booking Date
-                  </label>
-                  <input
-                    type="date"
-                    value={memberData.bookingDate}
-                    onChange={(e) => setMemberData({ ...memberData, bookingDate: e.target.value })}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                      fontFamily: "inherit",
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Start Time
-                  </label>
-                  <input
-                    type="time"
-                    value={memberData.startTime}
-                    onChange={(e) => setMemberData({ ...memberData, startTime: e.target.value })}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                      fontFamily: "inherit",
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Duration (hours)
-                </label>
-                <select
-                  value={memberData.duration}
-                  onChange={(e) => setMemberData({ ...memberData, duration: e.target.value })}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: "0.5rem",
-                    fontFamily: "inherit",
-                    cursor: "pointer",
-                  }}
-                >
-                  <option value="">Select duration</option>
-                  <option value="1">1 hour</option>
-                  <option value="2">2 hours</option>
-                </select>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={memberData.name}
-                    onChange={(e) => setMemberData({ ...memberData, name: e.target.value })}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                      fontFamily: "inherit",
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={memberData.email}
-                    onChange={(e) => setMemberData({ ...memberData, email: e.target.value })}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: "0.5rem",
-                      fontFamily: "inherit",
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Phone
+                  Member Email
                 </label>
                 <input
-                  type="tel"
-                  value={memberData.phone}
-                  onChange={(e) => setMemberData({ ...memberData, phone: e.target.value })}
+                  type="email"
+                  value={memberData.email}
+                  onChange={(e) => setMemberData({ ...memberData, email: e.target.value })}
                   required
                   style={{
                     width: "100%",
@@ -653,24 +512,27 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                     borderRadius: "0.5rem",
                     fontFamily: "inherit",
                   }}
+                  placeholder="Enter your email"
                 />
               </div>
 
               <div>
                 <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
-                  Additional Notes
+                  Password
                 </label>
-                <textarea
-                  value={memberData.notes}
-                  onChange={(e) => setMemberData({ ...memberData, notes: e.target.value })}
+                <input
+                  type="password"
+                  value={memberData.password}
+                  onChange={(e) => setMemberData({ ...memberData, password: e.target.value })}
+                  required
                   style={{
                     width: "100%",
                     padding: "0.75rem",
                     border: `1px solid ${C.border}`,
                     borderRadius: "0.5rem",
                     fontFamily: "inherit",
-                    minHeight: "100px",
                   }}
+                  placeholder="Enter your password"
                 />
               </div>
 
@@ -698,7 +560,7 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                     cursor: "pointer",
                   }}
                 >
-                  Submit Booking
+                  Sign In
                 </button>
               </div>
             </form>
@@ -1692,9 +1554,9 @@ function Spaces({ onPracticeRoomClick }: { onPracticeRoomClick: () => void }) {
       desc: "Professional practice rooms used by our faculty for lessons, available for individual rental. Equipped with quality instruments and acoustically treated.",
       features: ["Daily availability 6am–2am", "Acoustic treatment", "Quality instruments provided", "Flexible hourly rental"],
       images: [
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=932,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_005501641-YBgbgg63pnuxj3Ro.jpg",
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=512,fit=crop/A3QOXG1bN1tJNqOp/polish_20250611_010008888-Awv9vvVzM4S7ee4P.jpg",
-        "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,h=563,fit=crop/A3QOXG1bN1tJNqOp/mmexport1747177511454-Aq2W7gQaarC2n1pJ.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-1-YBgbgg63pnuxj3Ro.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-2-Awv9vvVzM4S7ee4P.jpg",
+        "https://d2xsxph8kpxj0f.cloudfront.net/310519663333334060/LSYMFpTaKgJ4fs4qHQmZSd/practice-room-3-Aq2W7gQaarC2n1pJ.jpg",
       ],
     },
     {

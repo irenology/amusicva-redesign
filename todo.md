@@ -297,19 +297,22 @@
 - [x] All 23 tests passing
 
 
-## Current Sprint - UI Fixes (In Progress)
+## Current Sprint - UI Fixes COMPLETED
 
-### Lessons Booking Form
-- [ ] Restore original "Book a Lesson" form for Lessons section
-- [ ] Form should display: teacher name, duration, student email
-- [ ] Remove Mango login redirect
+### Lessons Booking Form (COMPLETED)
+- [x] Restore original Book a Lesson form for Lessons section
+- [x] Form displays: teacher name, duration, student email
+- [x] Fixed handleLessonClick to open BookingModal
 
-### Member Login Simplification
-- [ ] Simplify Member Login modal to show only two fields
-- [ ] Field 1: Member Email
-- [ ] Field 2: Password
-- [ ] Remove other options/content
+### Member Login Simplification (COMPLETED)
+- [x] Simplify Member Login modal to show only two fields
+- [x] Field 1: Member Email
+- [x] Field 2: Password
+- [x] Remove practice room booking form and other options
+- [x] Add Sign In button
+- [x] Add back button to return to options
 
-### Welcome Screen Back Button
-- [ ] Add back arrow button to top-left corner of Welcome/Login screen
-- [ ] Button should navigate back to home page
+### Practice Rooms Images & Booking (COMPLETED)
+- [x] Fix three Practice Room images display
+- [x] Ensure Book Now button opens Book a Practice Room form
+- [x] Verify form submission works correctly
