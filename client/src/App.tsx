@@ -7,11 +7,13 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import ColorOptions from "./pages/ColorOptions";
+import PracticeRoomBooking from "./pages/PracticeRoomBooking";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/practice-room-booking"} component={PracticeRoomBooking} />
       <Route path={"/color-options"} component={ColorOptions} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

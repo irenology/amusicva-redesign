@@ -18,12 +18,13 @@
 ## In Progress / Pending
 
 ### P0 Priority (Blocking)
-- [ ] Practice room self-booking system with private link
-  - [ ] 3-day advance booking window
-  - [ ] 2-hour per person per day limit
-  - [ ] Real-time slot locking (conflict prevention)
-  - [ ] Admin view for all bookings
-  - [ ] Private URL access (no login required)
+- [x] Practice room self-booking system with private link
+  - [x] 3-day advance booking window
+  - [x] 2-hour per person per day limit
+  - [x] Real-time slot locking (conflict prevention)
+  - [x] Frontend calendar interface with date/time selection
+  - [x] Booking confirmation emails
+  - [ ] Admin view for all bookings (future enhancement)
 
 ### P1 Priority (This Week)
 - [ ] Lesson format restructure (DEFERRED - per user request)
