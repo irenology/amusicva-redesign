@@ -38,7 +38,6 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [activeEventType, setActiveEventType] = useState<string | null>(null);
-  const [activeInstrument, setActiveInstrument] = useState<string | null>(null);
 
   const C = colors || {
     bg: "#FAF7F2",
@@ -51,19 +50,13 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
     white: "#FDFCF9",
   };
 
-  // Get unique event types and instruments
+  // Get unique event types
   const eventTypes = Array.from(new Set(items.map((item) => item.eventType)));
-  const allInstruments = Array.from(
-    new Set(items.flatMap((item) => item.instruments))
-  ).sort();
 
-  // Filter items based on active filters
-  const filteredItems = items.filter((item) => {
-    const matchesEventType = !activeEventType || item.eventType === activeEventType;
-    const matchesInstrument =
-      !activeInstrument || item.instruments.includes(activeInstrument);
-    return matchesEventType && matchesInstrument;
-  });
+  // Filter items based on active event type
+  const filteredItems = activeEventType
+    ? items.filter((item) => item.eventType === activeEventType)
+    : items;
 
   const openLightbox = (item: GalleryItem) => {
     setSelectedItem(item);
@@ -81,74 +74,37 @@ export function CategorizedEventGallery({ items, colors }: CategorizedEventGalle
 
   return (
     <>
-      {/* Filter Buttons */}
+      {/* Filter Buttons - Event Type Only */}
       <div className="mb-12">
-        {/* Event Type Filters */}
-        <div className="mb-8">
-          <h4 className="font-display text-sm mb-4" style={{ color: C.text, fontWeight: 500 }}>
-            Filter by Event Type
-          </h4>
-          <div className="flex flex-wrap gap-3">
+        <h4 className="font-display text-sm mb-4" style={{ color: C.text, fontWeight: 500 }}>
+          Filter by Event Type
+        </h4>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setActiveEventType(null)}
+            className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
+            style={{
+              background: activeEventType === null ? C.accent : C.card,
+              color: activeEventType === null ? C.white : C.text,
+              border: `1px solid ${C.border}`,
+            }}
+          >
+            All Events
+          </button>
+          {eventTypes.map((eventType) => (
             <button
-              onClick={() => setActiveEventType(null)}
+              key={eventType}
+              onClick={() => setActiveEventType(eventType)}
               className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
               style={{
-                background: !activeEventType ? C.accent : C.card,
-                color: !activeEventType ? C.white : C.text,
+                background: activeEventType === eventType ? C.accent : C.card,
+                color: activeEventType === eventType ? C.white : C.text,
                 border: `1px solid ${C.border}`,
               }}
             >
-              All Events
+              {EVENT_TYPE_LABELS[eventType] || eventType}
             </button>
-            {eventTypes.map((eventType) => (
-              <button
-                key={eventType}
-                onClick={() => setActiveEventType(eventType)}
-                className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
-                style={{
-                  background: activeEventType === eventType ? C.accent : C.card,
-                  color: activeEventType === eventType ? C.white : C.text,
-                  border: `1px solid ${C.border}`,
-                }}
-              >
-                {EVENT_TYPE_LABELS[eventType] || eventType}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Instrument Filters */}
-        <div>
-          <h4 className="font-display text-sm mb-4" style={{ color: C.text, fontWeight: 500 }}>
-            Filter by Instrument
-          </h4>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => setActiveInstrument(null)}
-              className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md"
-              style={{
-                background: !activeInstrument ? C.accent : C.card,
-                color: !activeInstrument ? C.white : C.text,
-                border: `1px solid ${C.border}`,
-              }}
-            >
-              All Instruments
-            </button>
-            {allInstruments.map((instrument) => (
-              <button
-                key={instrument}
-                onClick={() => setActiveInstrument(instrument)}
-                className="px-4 py-2 rounded text-sm font-medium transition-all duration-200 hover:shadow-md capitalize"
-                style={{
-                  background: activeInstrument === instrument ? C.accent : C.card,
-                  color: activeInstrument === instrument ? C.white : C.text,
-                  border: `1px solid ${C.border}`,
-                }}
-              >
-                {instrument}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 
