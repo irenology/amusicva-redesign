@@ -2111,7 +2111,7 @@ function MembershipPlans() {
 
   return (
     <section
-      id="membership"
+      id="piano-practice-room"
       className="py-20"
       style={{ background: C.bgAlt }}
     >
