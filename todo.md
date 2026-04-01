@@ -295,3 +295,21 @@
 - [x] Remove "Book and Lesson Online" button from Contact section
 - [x] Clean up Contact section layout
 - [x] All 23 tests passing
+
+
+## Current Sprint - UI Fixes (In Progress)
+
+### Lessons Booking Form
+- [ ] Restore original "Book a Lesson" form for Lessons section
+- [ ] Form should display: teacher name, duration, student email
+- [ ] Remove Mango login redirect
+
+### Member Login Simplification
+- [ ] Simplify Member Login modal to show only two fields
+- [ ] Field 1: Member Email
+- [ ] Field 2: Password
+- [ ] Remove other options/content
+
+### Welcome Screen Back Button
+- [ ] Add back arrow button to top-left corner of Welcome/Login screen
+- [ ] Button should navigate back to home page

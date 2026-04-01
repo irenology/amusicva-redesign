@@ -2554,17 +2554,18 @@ export default function Home() {
   const [showCalendly, setShowCalendly] = useState(false);
   const [preSelectedTeacher, setPreSelectedTeacher] = useState<string | undefined>();
   const [practiceRoomModalOpen, setPracticeRoomModalOpen] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   const handleLessonClick = (teacher: string) => {
     setPreSelectedTeacher(teacher);
-    setShowCalendly(true);
+    setShowBookingModal(true);
   };
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
       <Nav onBookClick={() => setShowCalendly(true)} onPracticeRoomClick={() => setPracticeRoomModalOpen(true)} />
       <LoginModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} />
-      <BookingModal isOpen={false} onClose={() => {}} preSelectedTeacher={preSelectedTeacher} />
+      <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} preSelectedTeacher={preSelectedTeacher} />
       <Hero />
       <Vision />
       <Lessons onLessonClick={handleLessonClick} />
