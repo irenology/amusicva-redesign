@@ -267,3 +267,17 @@
   - [ ] Admin dashboard (already exists, link from Home)
 - [ ] Add user profile/account section for logged-in members
 - [ ] Test all login flows and role-based access
+
+
+## Current Sprint - Admin Email/Password Login ✅ COMPLETED
+
+### Admin Authentication System ✅
+- [x] Create admin authentication backend procedures (adminLogin in systemRouter)
+- [x] Add admin users to database with hashed passwords (3 accounts)
+  - [x] appassionatava@gmail.com / 12345678
+  - [x] admin@amusicva.com / 12345678
+  - [x] Norman@amusicva.com / 12345678
+- [x] Modify AdminLogin page UI (remove Manus OAuth, add email/password form)
+- [x] Implement login validation and session management
+- [x] Test admin login with all three accounts
+- [x] All 23 tests passing

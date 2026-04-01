@@ -29,6 +29,13 @@
       "when": 1775005192266,
       "tag": "0003_strange_captain_flint",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1775013014881,
+      "tag": "0004_giant_mauler",
+      "breakpoints": true
     }
   ]
 }
