@@ -380,6 +380,335 @@ function Divider() {
 
 // ─── Booking Modal ─────────────────────────────────────────────
 
+function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [loginStep, setLoginStep] = useState<"options" | "member">("options");
+  const [memberData, setMemberData] = useState({
+    membershipTier: "",
+    bookingDate: "",
+    startTime: "",
+    duration: "",
+    name: "",
+    email: "",
+    phone: "",
+    notes: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
+  const submitPracticeRoom = trpc.bookings.submitPracticeRoomBooking.useMutation();
+
+  const handleMemberSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await submitPracticeRoom.mutateAsync({
+        studentName: memberData.name,
+        studentEmail: memberData.email,
+        roomType: memberData.membershipTier.includes("Premium") ? "premium" : "standard",
+        hours: parseInt(memberData.duration) || 1,
+      });
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setLoginStep("options");
+        onClose();
+      }, 3000);
+    } catch (error) {
+      console.error("Booking failed:", error);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl rounded-lg overflow-hidden shadow-2xl"
+        style={{ background: C.white, maxHeight: "90vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div
+          className="sticky top-0 flex items-center justify-between p-6 border-b"
+          style={{ background: C.card, borderColor: C.border }}
+        >
+          <h2 className="font-display text-2xl" style={{ color: C.text, fontWeight: 500 }}>
+            {loginStep === "options" ? "Welcome" : "Become a Member"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
+            style={{ color: C.muted, background: "none", border: "none" }}
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          {loginStep === "options" ? (
+            <div className="space-y-4">
+              <p style={{ color: C.textMid, fontSize: "1rem", lineHeight: "1.6", marginBottom: "2rem" }}>
+                Choose how you'd like to proceed:
+              </p>
+              
+              <a
+                href="/admin/login"
+                className="block p-6 rounded text-center transition-all hover:shadow-lg"
+                style={{
+                  background: C.card,
+                  border: `2px solid ${C.border}`,
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+                onClick={() => onClose()}
+              >
+                <h3 className="font-display text-xl mb-2" style={{ color: C.text, fontWeight: 500 }}>
+                  Admin Login
+                </h3>
+                <p style={{ color: C.muted, fontSize: "0.9rem" }}>
+                  Access the admin dashboard to manage bookings and schedules
+                </p>
+              </a>
+
+              <button
+                onClick={() => setLoginStep("member")}
+                className="w-full p-6 rounded text-center transition-all hover:shadow-lg cursor-pointer"
+                style={{
+                  background: C.accent,
+                  border: `2px solid ${C.accent}`,
+                  textDecoration: "none",
+                }}
+              >
+                <h3 className="font-display text-xl mb-2" style={{ color: C.white, fontWeight: 500 }}>
+                  Become a Member
+                </h3>
+                <p style={{ color: `${C.white}dd`, fontSize: "0.9rem" }}>
+                  Book a practice room with our membership plans
+                </p>
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleMemberSubmit} className="space-y-4">
+              {submitted && (
+                <div
+                  className="mb-5 p-4 rounded font-ui text-sm"
+                  style={{ background: `${C.accent}15`, border: `1px solid ${C.accent}40`, color: C.accent }}
+                >
+                  Thank you! Your booking has been submitted. We'll contact you soon.
+                </div>
+              )}
+
+              <div>
+                <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  Membership Tier
+                </label>
+                <select
+                  value={memberData.membershipTier}
+                  onChange={(e) => setMemberData({ ...memberData, membershipTier: e.target.value })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontFamily: "inherit",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="">Select a membership tier</option>
+                  <option value="Weekday Afternoon">Weekday Afternoon ($109/month)</option>
+                  <option value="Extended Access">Extended Access ($159/month)</option>
+                  <option value="Unlimited">Unlimited ($209/month)</option>
+                </select>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                    Booking Date
+                  </label>
+                  <input
+                    type="date"
+                    value={memberData.bookingDate}
+                    onChange={(e) => setMemberData({ ...memberData, bookingDate: e.target.value })}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "0.75rem",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: "0.5rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                    Start Time
+                  </label>
+                  <input
+                    type="time"
+                    value={memberData.startTime}
+                    onChange={(e) => setMemberData({ ...memberData, startTime: e.target.value })}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "0.75rem",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: "0.5rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  Duration (hours)
+                </label>
+                <select
+                  value={memberData.duration}
+                  onChange={(e) => setMemberData({ ...memberData, duration: e.target.value })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontFamily: "inherit",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="">Select duration</option>
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                </select>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={memberData.name}
+                    onChange={(e) => setMemberData({ ...memberData, name: e.target.value })}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "0.75rem",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: "0.5rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={memberData.email}
+                    onChange={(e) => setMemberData({ ...memberData, email: e.target.value })}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "0.75rem",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: "0.5rem",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={memberData.phone}
+                  onChange={(e) => setMemberData({ ...memberData, phone: e.target.value })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ color: C.text, fontSize: "0.85rem", fontWeight: 600, display: "block", marginBottom: "0.5rem" }}>
+                  Additional Notes
+                </label>
+                <textarea
+                  value={memberData.notes}
+                  onChange={(e) => setMemberData({ ...memberData, notes: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
+                    fontFamily: "inherit",
+                    minHeight: "100px",
+                  }}
+                />
+              </div>
+
+              <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end", marginTop: "2rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setLoginStep("options")}
+                  className="px-6 py-2 rounded font-ui"
+                  style={{
+                    background: "transparent",
+                    border: `1px solid ${C.border}`,
+                    color: C.text,
+                    cursor: "pointer",
+                  }}
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded font-ui font-600"
+                  style={{
+                    background: C.accent,
+                    color: C.white,
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Submit Booking
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BookingModal({ isOpen, onClose, preSelectedTeacher }: { isOpen: boolean; onClose: () => void; preSelectedTeacher?: string }) {
   const [bookingType, setBookingType] = useState<"lesson" | "practice" | null>(preSelectedTeacher ? "lesson" : null);
   const [selectedTeacher, setSelectedTeacher] = useState<string>(preSelectedTeacher || "");
@@ -823,33 +1152,12 @@ function Nav({ onBookClick, onPracticeRoomClick }: { onBookClick: () => void; on
               />
             </a>
           ))}
-          <a
-            href="/admin/login"
-            className="font-ui text-sm px-4 py-2 rounded transition-all duration-200 hover:opacity-90"
-            style={{ background: "transparent", color: C.textMid, fontWeight: 500, border: `1px solid ${C.border}`, textDecoration: "none", letterSpacing: "0.04em" }}
-          >
-            Admin
-          </a>
-          <a
-            href="/membership"
-            className="font-ui text-sm px-4 py-2 rounded transition-all duration-200 hover:opacity-90"
-            style={{ background: "transparent", color: C.textMid, fontWeight: 500, border: `1px solid ${C.border}`, textDecoration: "none", letterSpacing: "0.04em" }}
-          >
-            Member
-          </a>
-          <button
-            onClick={() => onPracticeRoomClick()}
-            className="font-ui text-sm px-5 py-2 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
-            style={{ background: `${C.accent}80`, color: C.white, fontWeight: 600, letterSpacing: "0.05em", border: "none" }}
-          >
-            Book Practice Room
-          </button>
           <button
             onClick={onBookClick}
-            className="font-ui text-sm px-5 py-2 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
-            style={{ background: C.accent, color: C.white, fontWeight: 600, letterSpacing: "0.05em", border: "none" }}
+            className="font-ui text-sm px-8 py-2.5 rounded transition-all duration-200 hover:opacity-90 cursor-pointer"
+            style={{ background: C.accent, color: C.white, fontWeight: 600, letterSpacing: "0.05em", border: "none", fontSize: "1rem" }}
           >
-            Book Now
+            Login
           </button>
         </div>
 
@@ -878,23 +1186,13 @@ function Nav({ onBookClick, onPracticeRoomClick }: { onBookClick: () => void; on
           ))}
           <button
             onClick={() => {
-              onPracticeRoomClick();
-              setOpen(false);
-            }}
-            className="font-ui text-sm px-5 py-3 rounded text-center mt-2 w-full cursor-pointer"
-            style={{ background: `${C.accent}80`, color: C.white, fontWeight: 600, border: "none" }}
-          >
-            Book Practice Room
-          </button>
-          <button
-            onClick={() => {
               onBookClick();
               setOpen(false);
             }}
-            className="font-ui text-sm px-5 py-3 rounded text-center mt-2 w-full cursor-pointer"
-            style={{ background: C.accent, color: C.white, fontWeight: 600, border: "none" }}
+            className="font-ui text-sm px-5 py-3 rounded text-center mt-4 w-full cursor-pointer"
+            style={{ background: C.accent, color: C.white, fontWeight: 600, border: "none", fontSize: "1rem" }}
           >
-            Book Now
+            Login
           </button>
         </div>
       )}
@@ -2239,9 +2537,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
-      <Nav onBookClick={() => { setPreSelectedTeacher(undefined); setShowCalendly(true); }} onPracticeRoomClick={() => setPracticeRoomModalOpen(true)} />
-      <PracticeRoomBookingModal isOpen={practiceRoomModalOpen} onClose={() => setPracticeRoomModalOpen(false)} />
-      <BookingModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} preSelectedTeacher={preSelectedTeacher} />
+      <Nav onBookClick={() => setShowCalendly(true)} onPracticeRoomClick={() => setPracticeRoomModalOpen(true)} />
+      <LoginModal isOpen={showCalendly} onClose={() => setShowCalendly(false)} />
+      <BookingModal isOpen={false} onClose={() => {}} preSelectedTeacher={preSelectedTeacher} />
       <Hero />
       <Vision />
       <Lessons onLessonClick={handleLessonClick} />
