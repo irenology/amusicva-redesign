@@ -6,6 +6,11 @@ import { getDb } from "../db";
 import { users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { sdk } from "./sdk";
+import { getSessionCookieOptions } from "./cookies";
+
+const COOKIE_NAME = "session";
+const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
 
 export const systemRouter = router({
   health: publicProcedure
@@ -25,7 +30,7 @@ export const systemRouter = router({
         password: z.string().min(1, "Password is required"),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         // Find user by email
         const db = await getDb();
@@ -63,7 +68,16 @@ export const systemRouter = router({
           });
         }
 
-        // Return success - session will be managed by cookies
+        // Create session token and set cookie
+        const sessionToken = await sdk.createSessionToken(foundUser.id.toString(), {
+          name: (foundUser.name || foundUser.email) as string,
+          expiresInMs: ONE_YEAR_MS,
+        });
+        
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+        // Return success
         return {
           success: true,
           user: {

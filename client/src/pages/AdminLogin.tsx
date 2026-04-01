@@ -20,26 +20,25 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
 
-  const adminLoginMutation = (trpc as any).system?.adminLogin?.useMutation?.({
+  const adminLoginMutation = trpc.system.adminLogin.useMutation({
     onSuccess: () => {
       setLocation("/admin/dashboard");
     },
     onError: (err: any) => {
       setError(err.message || "Invalid email or password");
+      setIsLoading(false);
     },
-  }) as any;
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      await adminLoginMutation.mutateAsync({ email, password } as any);
+      await adminLoginMutation.mutateAsync({ email, password });
     } catch (err) {
-      // Error is handled by mutation callback
-    } finally {
-      setIsLoading(false);
+      console.error("[AdminLogin] Error:", err);
     }
   };
 
