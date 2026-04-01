@@ -964,6 +964,7 @@ function Nav({ onBookClick, onPracticeRoomClick }: { onBookClick: () => void; on
     { label: "Lessons", href: "#lessons" },
     { label: "Faculty", href: "#faculty" },
     { label: "Spaces", href: "#spaces" },
+    { label: "Events", href: "#events" },
     { label: "Contact", href: "#contact" },
   ];
 
@@ -1834,9 +1835,9 @@ function PaymentInfo() {
 function Events() {
   const upcomingEvents = [
     {
-      title: "East Meets West Spring Concert 2025",
-      date: "April 20, 2025",
-      time: "3:00 PM",
+      title: "2026",
+      date: "TBD",
+      time: "TBD",
       venue: "Fairfax, Virginia",
       description: "Join us for an evening of beautiful music featuring our talented students and faculty.",
     },
