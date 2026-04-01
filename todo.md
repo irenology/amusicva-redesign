@@ -281,3 +281,17 @@
 - [x] Implement login validation and session management
 - [x] Test admin login with all three accounts
 - [x] All 23 tests passing
+
+
+## Current Sprint - Bug Fixes ✅ COMPLETED
+
+### Lessons Section Fix ✅
+- [x] Remove Member Login redirect from Piano instrument card
+- [x] Restore "Book a Lesson" form when clicking Piano
+- [x] Verify form displays correctly with all fields
+- [x] Changed text to "Click to book a lesson"
+
+### Contact Section Fix ✅
+- [x] Remove "Book and Lesson Online" button from Contact section
+- [x] Clean up Contact section layout
+- [x] All 23 tests passing

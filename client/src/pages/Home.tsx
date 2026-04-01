@@ -1549,7 +1549,7 @@ function Lessons({ onLessonClick }: { onLessonClick: (teacher: string) => void }
                 {lesson.desc}
               </p>
               <p style={{ color: C.accent, fontSize: "0.85rem", fontWeight: 500, marginTop: "1rem" }}>
-                → Click to book with {lessonToTeacher[lesson.title]}
+                → Click to book a lesson
               </p>
             </div>
           ))}
@@ -2395,14 +2395,6 @@ function Contact({ onBookClick }: { onBookClick: () => void }) {
                 </div>
               ))}
             </div>
-
-            <button
-              onClick={onBookClick}
-              className="font-ui inline-block px-8 py-3.5 rounded transition-all hover:opacity-90 cursor-pointer mt-8"
-              style={{ background: C.accent, color: C.white, fontWeight: 600, fontSize: "0.9rem", letterSpacing: "0.05em", border: "none" }}
-            >
-              Book a Lesson Online
-            </button>
           </div>
 
           {/* Right: Form */}
