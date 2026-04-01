@@ -12,7 +12,6 @@ import { hash } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { getDb } from "../db";
 import { users } from "../../drizzle/schema";
-
 // Admin accounts that must always exist
 const REQUIRED_ADMINS = [
   { email: "admin@amusicva.com", password: "12345678", name: "Admin" },
@@ -20,7 +19,6 @@ const REQUIRED_ADMINS = [
   { email: "Norman.Charette@gmail.com", password: "12345678", name: "Norman Charette" },
   { email: "Norman@amusicva.com", password: "12345678", name: "Norman" },
 ];
-
 async function ensureAdminAccounts() {
   const db = await getDb();
   if (!db) {
@@ -50,7 +48,6 @@ async function ensureAdminAccounts() {
     }
   }
 }
-
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
     const server = net.createServer();
@@ -60,7 +57,6 @@ function isPortAvailable(port: number): Promise<boolean> {
     server.on("error", () => resolve(false));
   });
 }
-
 async function findAvailablePort(startPort: number = 3000): Promise<number> {
   for (let port = startPort; port < startPort + 20; port++) {
     if (await isPortAvailable(port)) {
@@ -69,11 +65,9 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   }
   throw new Error(`No available port found starting from ${startPort}`);
 }
-
 async function startServer() {
   // Ensure all admin accounts exist before serving requests
   await ensureAdminAccounts();
-
   const app = express();
   const server = createServer(app);
   app.use(express.json({ limit: "50mb" }));
@@ -92,17 +86,13 @@ async function startServer() {
   } else {
     serveStatic(app);
   }
-
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
-
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
-
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Server running on http://localhost:${port}/ - v2`);
   });
 }
-
 startServer().catch(console.error);
